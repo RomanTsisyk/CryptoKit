@@ -1,5 +1,15 @@
 # **CryptoKit**
 
+![Purpose](https://img.shields.io/badge/purpose-cryptographic%20library-blue)
+![Status](https://img.shields.io/badge/status-active-brightgreen)
+![Last Commit](https://img.shields.io/github/last-commit/RomanTsisyk/CryptoKit)
+![Docs](https://img.shields.io/badge/docs-up--to--date-brightgreen)
+![OpenSSF Best Practices](https://bestpractices.coreinfrastructure.org/projects/1/badge)
+[![Known Vulnerabilities](https://snyk.io/test/github/RomanTsisyk/CryptoKit/badge.svg)](https://snyk.io/test/github/RomanTsisyk/CryptoKit)
+![GitHub stars](https://img.shields.io/github/stars/RomanTsisyk/CryptoKit?style=social)
+![Contributors](https://img.shields.io/github/contributors/RomanTsisyk/CryptoKit)
+
+
 **CryptoKit** is a comprehensive Kotlin cryptography library designed to secure modern applications. It simplifies encryption, decryption, secure key management, QR code handling, and more, making cryptography accessible for developers.
 
 ---
