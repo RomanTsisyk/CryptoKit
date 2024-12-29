@@ -1,7 +1,6 @@
 package io.github.romantsisyk.cryptolib.exceptions
 
 /**
- * Exception thrown during encryption/decryption failures.
+ * Exception thrown when a cryptographic operation fails.
  */
-class CryptoOperationException(operation: String, cause: Throwable?) :
-    CryptoLibException("Encryption/Decryption operation failed: $operation.", cause)
+class CryptoOperationException(message: String, cause: Throwable?) : CryptoLibException(message, cause)

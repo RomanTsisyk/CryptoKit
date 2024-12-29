@@ -1,0 +1,91 @@
+$dokka.format:html-v1
+$dokka.linkExtension:html
+$dokka.location:////PointingToDeclaration/cryptolib/[root]/index.html
+$dokka.location:/BiometricHelper///PointingToDeclaration/cryptolib/[root]/-biometric-helper/index.html
+$dokka.location:/BiometricHelper/BiometricHelper/#android.content.Context/PointingToDeclaration/cryptolib/[root]/-biometric-helper/-biometric-helper.html
+$dokka.location:/BiometricHelper/authenticate/#androidx.fragment.app.FragmentActivity#kotlin.String#kotlin.String#kotlin.ByteArray#kotlin.Function1[kotlin.ByteArray,kotlin.Unit]#kotlin.Function1[java.lang.Exception,kotlin.Unit]#kotlin.Function2[kotlin.Int,kotlin.CharSequence,kotlin.Unit]/PointingToDeclaration/cryptolib/[root]/-biometric-helper/authenticate.html
+$dokka.location:/DigitalSignature///PointingToDeclaration/cryptolib/[root]/-digital-signature/index.html
+$dokka.location:/DigitalSignature/generateKeyPair/#kotlin.String/PointingToDeclaration/cryptolib/[root]/-digital-signature/generate-key-pair.html
+$dokka.location:/DigitalSignature/sign/#kotlin.ByteArray#java.security.PrivateKey/PointingToDeclaration/cryptolib/[root]/-digital-signature/sign.html
+$dokka.location:/DigitalSignature/verify/#kotlin.ByteArray#kotlin.String#java.security.PublicKey/PointingToDeclaration/cryptolib/[root]/-digital-signature/verify.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.aes////PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.aes/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.aes/AESEncryption///PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.aes/-a-e-s-encryption/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.aes/AESEncryption/decrypt/#kotlin.String#javax.crypto.SecretKey/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.aes/-a-e-s-encryption/decrypt.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.aes/AESEncryption/encrypt/#kotlin.ByteArray#javax.crypto.SecretKey/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.aes/-a-e-s-encryption/encrypt.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.aes/AESEncryption/generateKey/#/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.aes/-a-e-s-encryption/generate-key.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.config////PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.config/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.config/CryptoConfig.Builder///PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.config/-crypto-config/-builder/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.config/CryptoConfig.Builder/Builder/#kotlin.String/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.config/-crypto-config/-builder/-builder.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.config/CryptoConfig.Builder/build/#/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.config/-crypto-config/-builder/build.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.config/CryptoConfig.Builder/keyRotationIntervalDays/#kotlin.Int/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.config/-crypto-config/-builder/key-rotation-interval-days.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.config/CryptoConfig.Builder/keyValidityDays/#kotlin.Int/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.config/-crypto-config/-builder/key-validity-days.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.config/CryptoConfig.Builder/requireUserAuthentication/#kotlin.Boolean/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.config/-crypto-config/-builder/require-user-authentication.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.config/CryptoConfig///PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.config/-crypto-config/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.config/CryptoConfig/keyAlias/#/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.config/-crypto-config/key-alias.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.config/CryptoConfig/keyRotationIntervalDays/#/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.config/-crypto-config/key-rotation-interval-days.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.config/CryptoConfig/keyValidityDays/#/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.config/-crypto-config/key-validity-days.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.config/CryptoConfig/requireUserAuthentication/#/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.config/-crypto-config/require-user-authentication.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.keymanagement////PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.keymanagement/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.keymanagement/KeyHelper///PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.keymanagement/-key-helper/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.keymanagement/KeyHelper/deleteKey/#kotlin.String/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.keymanagement/-key-helper/delete-key.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.keymanagement/KeyHelper/generateAESKey/#kotlin.String#kotlin.Int#kotlin.Boolean/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.keymanagement/-key-helper/generate-a-e-s-key.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.keymanagement/KeyHelper/generateECKeyPair/#kotlin.String/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.keymanagement/-key-helper/generate-e-c-key-pair.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.keymanagement/KeyHelper/generateRSAKeyPair/#kotlin.String/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.keymanagement/-key-helper/generate-r-s-a-key-pair.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.keymanagement/KeyHelper/getAESKey/#kotlin.String/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.keymanagement/-key-helper/get-a-e-s-key.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.keymanagement/KeyHelper/getCipherInstance/#/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.keymanagement/-key-helper/get-cipher-instance.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.keymanagement/KeyHelper/getKey/#/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.keymanagement/-key-helper/get-key.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.keymanagement/KeyHelper/getKeyInfo/#kotlin.String/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.keymanagement/-key-helper/get-key-info.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.keymanagement/KeyHelper/getOrCreateSecretKey/#/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.keymanagement/-key-helper/get-or-create-secret-key.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.keymanagement/KeyHelper/getPrivateKey/#kotlin.String/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.keymanagement/-key-helper/get-private-key.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.keymanagement/KeyHelper/getPublicKey/#kotlin.String/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.keymanagement/-key-helper/get-public-key.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.keymanagement/KeyHelper/listKeys/#/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.keymanagement/-key-helper/list-keys.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.keymanagement/KeyRotationManager///PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.keymanagement/-key-rotation-manager/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.keymanagement/KeyRotationManager/isKeyRotationNeeded/#kotlin.String/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.keymanagement/-key-rotation-manager/is-key-rotation-needed.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.keymanagement/KeyRotationManager/rotateKeyIfNeeded/#kotlin.String/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.keymanagement/-key-rotation-manager/rotate-key-if-needed.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.keymanagement/KeyRotationScheduler///PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.keymanagement/-key-rotation-scheduler/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.keymanagement/KeyRotationScheduler/scheduleKeyRotation/#android.content.Context/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.keymanagement/-key-rotation-scheduler/schedule-key-rotation.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.keymanagement/KeyRotationWorker///PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.keymanagement/-key-rotation-worker/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.keymanagement/KeyRotationWorker/KeyRotationWorker/#android.content.Context#androidx.work.WorkerParameters/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.keymanagement/-key-rotation-worker/-key-rotation-worker.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.keymanagement/KeyRotationWorker/doWork/#/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.keymanagement/-key-rotation-worker/do-work.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.manager////PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.manager/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.manager/CryptoManager///PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.manager/-crypto-manager/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.manager/CryptoManager/decryptData/#android.app.Activity#io.github.romantsisyk.cryptolib.crypto.config.CryptoConfig#kotlin.String#kotlin.Function1[kotlin.ByteArray,kotlin.Unit]#kotlin.Function1[io.github.romantsisyk.cryptolib.exceptions.CryptoLibException,kotlin.Unit]/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.manager/-crypto-manager/decrypt-data.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.manager/CryptoManager/encryptData/#android.app.Activity#io.github.romantsisyk.cryptolib.crypto.config.CryptoConfig#kotlin.ByteArray#kotlin.Function1[kotlin.String,kotlin.Unit]#kotlin.Function1[io.github.romantsisyk.cryptolib.exceptions.CryptoLibException,kotlin.Unit]/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.manager/-crypto-manager/encrypt-data.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.qr////PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.qr/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.qr//generateQRCode/#kotlin.String#kotlin.Int#kotlin.Int/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.qr/generate-q-r-code.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.qr/BitmapLuminanceSource///PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.qr/-bitmap-luminance-source/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.qr/BitmapLuminanceSource/BitmapLuminanceSource/#android.graphics.Bitmap/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.qr/-bitmap-luminance-source/-bitmap-luminance-source.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.qr/BitmapLuminanceSource/getMatrix/#/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.qr/-bitmap-luminance-source/get-matrix.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.qr/BitmapLuminanceSource/getRow/#kotlin.Int#kotlin.ByteArray?/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.qr/-bitmap-luminance-source/get-row.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.qr/QRCodeScanner///PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.qr/-q-r-code-scanner/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.qr/QRCodeScanner/QRCodeScanner/#/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.qr/-q-r-code-scanner/-q-r-code-scanner.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.qr/QRCodeScanner/decodeQRCode/#android.graphics.Bitmap/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.qr/-q-r-code-scanner/decode-q-r-code.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.qr/QRKeyManager///PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.qr/-q-r-key-manager/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.qr/QRKeyManager/generateKey/#/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.qr/-q-r-key-manager/generate-key.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.qr/QRKeyManager/getKey/#/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.qr/-q-r-key-manager/get-key.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.qr/QRUtils///PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.qr/-q-r-utils/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.qr/QRUtils/decryptData/#kotlin.String#javax.crypto.SecretKey#kotlin.ByteArray/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.qr/-q-r-utils/decrypt-data.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.qr/QRUtils/encryptData/#kotlin.String#javax.crypto.SecretKey/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.qr/-q-r-utils/encrypt-data.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.rsa////PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.rsa/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.rsa/RSAEncryption///PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.rsa/-r-s-a-encryption/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.rsa/RSAEncryption/decrypt/#kotlin.String#java.security.PrivateKey/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.rsa/-r-s-a-encryption/decrypt.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.rsa/RSAEncryption/encrypt/#kotlin.ByteArray#java.security.PublicKey/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.rsa/-r-s-a-encryption/encrypt.html
+$dokka.location:io.github.romantsisyk.cryptolib.crypto.rsa/RSAEncryption/generateKeyPair/#/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.crypto.rsa/-r-s-a-encryption/generate-key-pair.html
+$dokka.location:io.github.romantsisyk.cryptolib.exceptions////PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.exceptions/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.exceptions/AuthenticationException///PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.exceptions/-authentication-exception/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.exceptions/AuthenticationException/AuthenticationException/#kotlin.String#kotlin.Throwable?/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.exceptions/-authentication-exception/-authentication-exception.html
+$dokka.location:io.github.romantsisyk.cryptolib.exceptions/CryptoLibException///PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.exceptions/-crypto-lib-exception/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.exceptions/CryptoLibException/CryptoLibException/#kotlin.String#kotlin.Throwable?/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.exceptions/-crypto-lib-exception/-crypto-lib-exception.html
+$dokka.location:io.github.romantsisyk.cryptolib.exceptions/CryptoOperationException///PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.exceptions/-crypto-operation-exception/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.exceptions/CryptoOperationException/CryptoOperationException/#kotlin.String#kotlin.Throwable?/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.exceptions/-crypto-operation-exception/-crypto-operation-exception.html
+$dokka.location:io.github.romantsisyk.cryptolib.exceptions/KeyGenerationException///PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.exceptions/-key-generation-exception/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.exceptions/KeyGenerationException/KeyGenerationException/#kotlin.String#kotlin.Throwable?/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.exceptions/-key-generation-exception/-key-generation-exception.html
+$dokka.location:io.github.romantsisyk.cryptolib.exceptions/KeyNotFoundException///PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.exceptions/-key-not-found-exception/index.html
+$dokka.location:io.github.romantsisyk.cryptolib.exceptions/KeyNotFoundException/KeyNotFoundException/#kotlin.String/PointingToDeclaration/cryptolib/io.github.romantsisyk.cryptolib.exceptions/-key-not-found-exception/-key-not-found-exception.html
+io.github.romantsisyk.cryptolib.crypto.aes
+io.github.romantsisyk.cryptolib.crypto.config
+io.github.romantsisyk.cryptolib.crypto.keymanagement
+io.github.romantsisyk.cryptolib.crypto.manager
+io.github.romantsisyk.cryptolib.crypto.qr
+io.github.romantsisyk.cryptolib.crypto.rsa
+io.github.romantsisyk.cryptolib.exceptions

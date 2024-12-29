@@ -12,7 +12,12 @@ import io.github.romantsisyk.cryptolib.exceptions.*
 object CryptoManager {
 
     /**
-     * Encrypts data after authenticating the user if required.
+     * Encrypts the provided plaintext data after authenticating the user, if required.
+     * @param activity The activity context used for user authentication (if enabled).
+     * @param config The CryptoConfig object containing encryption configuration.
+     * @param plaintext The plaintext data to encrypt.
+     * @param onSuccess Callback invoked with the encrypted data (in base64 format) upon success.
+     * @param onFailure Callback invoked with an error if encryption fails.
      */
     fun encryptData(
         activity: Activity,
@@ -31,7 +36,7 @@ object CryptoManager {
                     val encryptedData = AESEncryption.encrypt(plaintext, secretKey)
                     onSuccess(encryptedData)
 
-                    // Schedule key rotation
+                    // Schedule key rotation if needed
                     KeyRotationManager.rotateKeyIfNeeded(config.keyAlias)
                 } catch (e: CryptoOperationException) {
                     onFailure(e)
@@ -42,7 +47,12 @@ object CryptoManager {
     }
 
     /**
-     * Decrypts data after authenticating the user if required.
+     * Decrypts the provided encrypted data after authenticating the user, if required.
+     * @param activity The activity context used for user authentication (if enabled).
+     * @param config The CryptoConfig object containing decryption configuration.
+     * @param encryptedData The encrypted data in base64 format to decrypt.
+     * @param onSuccess Callback invoked with the decrypted data upon success.
+     * @param onFailure Callback invoked with an error if decryption fails.
      */
     fun decryptData(
         activity: Activity,
@@ -69,7 +79,13 @@ object CryptoManager {
     }
 
     /**
-     * Handles authentication and key retrieval for both encryption and decryption.
+     * Performs user authentication and retrieves the secret key for encryption or decryption.
+     * @param activity The activity context used for user authentication (if enabled).
+     * @param config The CryptoConfig object containing key configuration.
+     * @param title Title displayed during authentication.
+     * @param description Description displayed during authentication.
+     * @param onAuthenticated Callback invoked with the retrieved secret key after successful authentication.
+     * @param onFailure Callback invoked with an error if the operation fails.
      */
     private fun performAuthenticatedAction(
         activity: Activity,
@@ -92,6 +108,7 @@ object CryptoManager {
             val secretKey = KeyHelper.getAESKey(config.keyAlias)
 
             if (config.requireUserAuthentication) {
+                // Perform biometric authentication
                 BiometricHelper(context = activity).authenticate(
                     activity = activity as FragmentActivity,
                     title = title,

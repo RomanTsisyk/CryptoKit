@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>BitmapLuminanceSource</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+    <div class="root">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
+            <a class="library-name--link" href="../../../index.html">
+                    cryptolib
+            </a>
+        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle"
+                type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active=""
+                        data-filter=":cryptolib:dokkaHtml/release">androidJvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox"
+                        data-role="dropdown-toggle"
+                        aria-controls="platform-tags-listbox"
+                        aria-haspopup="listbox"
+                        aria-expanded="false"
+                        aria-label="Toggle source sets"
+                ></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":cryptolib:dokkaHtml/release"
+                                       data-filter=":cryptolib:dokkaHtml/release"/>
+                                <span class="checkbox--icon"></span>
+                                androidJvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </div>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button"
+                    type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list"
+                        data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    cryptolib
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="cryptolib::io.github.romantsisyk.cryptolib.crypto.qr/BitmapLuminanceSource///PointingToDeclaration//593748548">
+  <div class="breadcrumbs"><a href="../../../index.html">cryptolib</a><span class="delimiter">/</span><a href="../index.html">io.github.romantsisyk.cryptolib.crypto.qr</a><span class="delimiter">/</span><span class="current">BitmapLuminanceSource</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Bitmap</span><wbr></wbr><span>Luminance</span><wbr></wbr><span><span>Source</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":cryptolib:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">BitmapLuminanceSource</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bitmap<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/graphics/Bitmap.html">Bitmap</a></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="com.google.zxing/LuminanceSource///PointingToDeclaration/">LuminanceSource</span></div><p class="paragraph">Custom LuminanceSource that converts a Bitmap image into a luminance array for QR code scanning.</p><h4 class="">Parameters</h4><div class="table"><div class="table-row" data-filterable-current=":cryptolib:dokkaHtml/release" data-filterable-set=":cryptolib:dokkaHtml/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>bitmap</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The Bitmap image to convert into luminance values.</p></div></div></div></div></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="1617179591%2FConstructors%2F593748548" anchor-label="BitmapLuminanceSource" id="1617179591%2FConstructors%2F593748548" data-filterable-set=":cryptolib:dokkaHtml/release"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":cryptolib:dokkaHtml/release" data-filterable-set=":cryptolib:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-bitmap-luminance-source.html"><span>Bitmap</span><wbr></wbr><span>Luminance</span><wbr></wbr><span><span>Source</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1617179591%2FConstructors%2F593748548"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":cryptolib:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bitmap<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/graphics/Bitmap.html">Bitmap</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="-806401881%2FProperties%2F593748548" anchor-label="height" id="-806401881%2FProperties%2F593748548" data-filterable-set=":cryptolib:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":cryptolib:dokkaHtml/release" data-filterable-set=":cryptolib:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-806401881%2FProperties%2F593748548"><span><span>height</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-806401881%2FProperties%2F593748548"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":cryptolib:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="index.html#-806401881%2FProperties%2F593748548">height</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1537616486%2FProperties%2F593748548" anchor-label="width" id="1537616486%2FProperties%2F593748548" data-filterable-set=":cryptolib:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":cryptolib:dokkaHtml/release" data-filterable-set=":cryptolib:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1537616486%2FProperties%2F593748548"><span><span>width</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1537616486%2FProperties%2F593748548"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":cryptolib:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="index.html#1537616486%2FProperties%2F593748548">width</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="1068542273%2FFunctions%2F593748548" anchor-label="crop" id="1068542273%2FFunctions%2F593748548" data-filterable-set=":cryptolib:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":cryptolib:dokkaHtml/release" data-filterable-set=":cryptolib:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1068542273%2FFunctions%2F593748548"><span><span>crop</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1068542273%2FFunctions%2F593748548"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":cryptolib:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#1068542273%2FFunctions%2F593748548"><span class="token function">crop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">p0<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">p1<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">p2<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">p3<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.google.zxing/LuminanceSource///PointingToDeclaration/">LuminanceSource</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1296503403%2FFunctions%2F593748548" anchor-label="getMatrix" id="-1296503403%2FFunctions%2F593748548" data-filterable-set=":cryptolib:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":cryptolib:dokkaHtml/release" data-filterable-set=":cryptolib:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-matrix.html"><span>get</span><wbr></wbr><span><span>Matrix</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1296503403%2FFunctions%2F593748548"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":cryptolib:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="get-matrix.html"><span class="token function">getMatrix</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-byte-array/index.html">ByteArray</a></div><div class="brief "><p class="paragraph">Retrieves the complete luminance array for the entire bitmap.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1300989936%2FFunctions%2F593748548" anchor-label="getRow" id="-1300989936%2FFunctions%2F593748548" data-filterable-set=":cryptolib:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":cryptolib:dokkaHtml/release" data-filterable-set=":cryptolib:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-row.html"><span>get</span><wbr></wbr><span><span>Row</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1300989936%2FFunctions%2F593748548"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":cryptolib:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="get-row.html"><span class="token function">getRow</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">y<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">row<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-byte-array/index.html">ByteArray</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-byte-array/index.html">ByteArray</a></div><div class="brief "><p class="paragraph">Retrieves the luminance values for a specific row of the bitmap.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1602309336%2FFunctions%2F593748548" anchor-label="invert" id="1602309336%2FFunctions%2F593748548" data-filterable-set=":cryptolib:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":cryptolib:dokkaHtml/release" data-filterable-set=":cryptolib:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1602309336%2FFunctions%2F593748548"><span><span>invert</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1602309336%2FFunctions%2F593748548"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":cryptolib:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#1602309336%2FFunctions%2F593748548"><span class="token function">invert</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.google.zxing/LuminanceSource///PointingToDeclaration/">LuminanceSource</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1215142344%2FFunctions%2F593748548" anchor-label="isCropSupported" id="-1215142344%2FFunctions%2F593748548" data-filterable-set=":cryptolib:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":cryptolib:dokkaHtml/release" data-filterable-set=":cryptolib:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1215142344%2FFunctions%2F593748548"><span>is</span><wbr></wbr><span>Crop</span><wbr></wbr><span><span>Supported</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1215142344%2FFunctions%2F593748548"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":cryptolib:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#-1215142344%2FFunctions%2F593748548"><span class="token function">isCropSupported</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1582838781%2FFunctions%2F593748548" anchor-label="isRotateSupported" id="-1582838781%2FFunctions%2F593748548" data-filterable-set=":cryptolib:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":cryptolib:dokkaHtml/release" data-filterable-set=":cryptolib:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1582838781%2FFunctions%2F593748548"><span>is</span><wbr></wbr><span>Rotate</span><wbr></wbr><span><span>Supported</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1582838781%2FFunctions%2F593748548"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":cryptolib:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#-1582838781%2FFunctions%2F593748548"><span class="token function">isRotateSupported</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1378860157%2FFunctions%2F593748548" anchor-label="rotateCounterClockwise" id="1378860157%2FFunctions%2F593748548" data-filterable-set=":cryptolib:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":cryptolib:dokkaHtml/release" data-filterable-set=":cryptolib:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1378860157%2FFunctions%2F593748548"><span>rotate</span><wbr></wbr><span>Counter</span><wbr></wbr><span><span>Clockwise</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1378860157%2FFunctions%2F593748548"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":cryptolib:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#1378860157%2FFunctions%2F593748548"><span class="token function">rotateCounterClockwise</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.google.zxing/LuminanceSource///PointingToDeclaration/">LuminanceSource</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1560139492%2FFunctions%2F593748548" anchor-label="rotateCounterClockwise45" id="-1560139492%2FFunctions%2F593748548" data-filterable-set=":cryptolib:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":cryptolib:dokkaHtml/release" data-filterable-set=":cryptolib:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1560139492%2FFunctions%2F593748548"><span>rotate</span><wbr></wbr><span>Counter</span><wbr></wbr><span><span>Clockwise45</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1560139492%2FFunctions%2F593748548"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":cryptolib:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#-1560139492%2FFunctions%2F593748548"><span class="token function">rotateCounterClockwise45</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.google.zxing/LuminanceSource///PointingToDeclaration/">LuminanceSource</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1060780350%2FFunctions%2F593748548" anchor-label="toString" id="-1060780350%2FFunctions%2F593748548" data-filterable-set=":cryptolib:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":cryptolib:dokkaHtml/release" data-filterable-set=":cryptolib:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1060780350%2FFunctions%2F593748548"><span>to</span><wbr></wbr><span><span>String</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1060780350%2FFunctions%2F593748548"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":cryptolib:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">override </span><span class="token keyword">fun </span><a href="index.html#-1060780350%2FFunctions%2F593748548"><span class="token function">toString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2024 Copyright</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

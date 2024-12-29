@@ -5,10 +5,19 @@ import android.security.keystore.KeyProperties
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 
+/**
+ * QRKeyManager handles key generation and retrieval for QR code encryption using AES.
+ * It utilizes the Android Keystore system for secure key storage and management.
+ */
 object QRKeyManager {
-    private const val ALIAS = "CryptoKitQRCodeKey"
-    private const val TRANSFORMATION = "AES"
+    private const val ALIAS = "CryptoKitQRCodeKey" // Alias used for the key in the Keystore
+    private const val TRANSFORMATION = "AES" // Transformation type for encryption
 
+    /**
+     * Generates a new encryption key for QR code encryption.
+     * The key is stored in the Android Keystore for secure access.
+     * @return A SecretKey object for encryption.
+     */
     fun generateKey(): SecretKey {
         val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
         keyGenerator.init(
@@ -23,15 +32,13 @@ object QRKeyManager {
         return keyGenerator.generateKey()
     }
 
+    /**
+     * Retrieves the encryption key from the Android Keystore.
+     * @return The SecretKey stored in the Keystore.
+     */
     fun getKey(): SecretKey {
         val keyStore = java.security.KeyStore.getInstance("AndroidKeyStore")
         keyStore.load(null)
         return keyStore.getKey(ALIAS, null) as SecretKey
     }
-
-//    fun generateKey(): SecretKey {
-//        val keyGenerator = KeyGenerator.getInstance("AES", "AndroidKeyStore")
-//        keyGenerator.init(256) // Use appropriate key size
-//        return keyGenerator.generateKey()
-//    }
 }
