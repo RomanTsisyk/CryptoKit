@@ -1,6 +1,7 @@
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.dokka")
 }
 
 android {
@@ -69,3 +70,4 @@ dependencies {
     androidTestImplementation ("androidx.test:core:1.6.1")
 
 }
+

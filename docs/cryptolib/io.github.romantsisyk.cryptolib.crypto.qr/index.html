@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>io.github.romantsisyk.cryptolib.crypto.qr</title>
+    <link href="../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
+<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../styles/style.css" rel="Stylesheet">
+<link href="../../styles/main.css" rel="Stylesheet">
+<link href="../../styles/prism.css" rel="Stylesheet">
+<link href="../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer="defer"></script>
+<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+    <div class="root">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
+            <a class="library-name--link" href="../../index.html">
+                    cryptolib
+            </a>
+        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle"
+                type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active=""
+                        data-filter=":cryptolib:dokkaHtml/release">androidJvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox"
+                        data-role="dropdown-toggle"
+                        aria-controls="platform-tags-listbox"
+                        aria-haspopup="listbox"
+                        aria-expanded="false"
+                        aria-label="Toggle source sets"
+                ></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":cryptolib:dokkaHtml/release"
+                                       data-filter=":cryptolib:dokkaHtml/release"/>
+                                <span class="checkbox--icon"></span>
+                                androidJvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </div>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button"
+                    type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list"
+                        data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    cryptolib
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="package" id="content" pageIds="cryptolib::io.github.romantsisyk.cryptolib.crypto.qr////PointingToDeclaration//593748548">
+  <div class="breadcrumbs"><a href="../../index.html">cryptolib</a><span class="delimiter">/</span><span class="current">io.github.romantsisyk.cryptolib.crypto.qr</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="955894385%2FClasslikes%2F593748548" anchor-label="BitmapLuminanceSource" id="955894385%2FClasslikes%2F593748548" data-filterable-set=":cryptolib:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":cryptolib:dokkaHtml/release" data-filterable-set=":cryptolib:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-bitmap-luminance-source/index.html"><span>Bitmap</span><wbr></wbr><span>Luminance</span><wbr></wbr><span><span>Source</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="955894385%2FClasslikes%2F593748548"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":cryptolib:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">class </span><a href="-bitmap-luminance-source/index.html">BitmapLuminanceSource</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bitmap<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/graphics/Bitmap.html">Bitmap</a></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="com.google.zxing/LuminanceSource///PointingToDeclaration/">LuminanceSource</span></div><div class="brief "><p class="paragraph">Custom LuminanceSource that converts a Bitmap image into a luminance array for QR code scanning.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1248568475%2FClasslikes%2F593748548" anchor-label="QRCodeScanner" id="-1248568475%2FClasslikes%2F593748548" data-filterable-set=":cryptolib:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":cryptolib:dokkaHtml/release" data-filterable-set=":cryptolib:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-q-r-code-scanner/index.html"><span>QRCode</span><wbr></wbr><span><span>Scanner</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1248568475%2FClasslikes%2F593748548"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":cryptolib:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">class </span><a href="-q-r-code-scanner/index.html">QRCodeScanner</a></div><div class="brief "><p class="paragraph">Class responsible for scanning and decoding QR codes from a bitmap. This uses the ZXing library to decode QR codes.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="31593886%2FClasslikes%2F593748548" anchor-label="QRKeyManager" id="31593886%2FClasslikes%2F593748548" data-filterable-set=":cryptolib:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":cryptolib:dokkaHtml/release" data-filterable-set=":cryptolib:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-q-r-key-manager/index.html"><span>QRKey</span><wbr></wbr><span><span>Manager</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="31593886%2FClasslikes%2F593748548"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":cryptolib:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">object </span><a href="-q-r-key-manager/index.html">QRKeyManager</a></div><div class="brief "><p class="paragraph">QRKeyManager handles key generation and retrieval for QR code encryption using AES. It utilizes the Android Keystore system for secure key storage and management.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="481464773%2FClasslikes%2F593748548" anchor-label="QRUtils" id="481464773%2FClasslikes%2F593748548" data-filterable-set=":cryptolib:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":cryptolib:dokkaHtml/release" data-filterable-set=":cryptolib:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-q-r-utils/index.html"><span><span>QRUtils</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="481464773%2FClasslikes%2F593748548"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":cryptolib:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">object </span><a href="-q-r-utils/index.html">QRUtils</a></div><div class="brief "><p class="paragraph">QRUtils provides utility functions for encrypting and decrypting data for QR codes using AES/GCM encryption. These functions help secure QR code data before transmission or storage.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="1626989109%2FFunctions%2F593748548" anchor-label="generateQRCode" id="1626989109%2FFunctions%2F593748548" data-filterable-set=":cryptolib:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":cryptolib:dokkaHtml/release" data-filterable-set=":cryptolib:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="generate-q-r-code.html"><span>generate</span><wbr></wbr><span><span>QRCode</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1626989109%2FFunctions%2F593748548"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":cryptolib:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="generate-q-r-code.html"><span class="token function">generateQRCode</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">data<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">width<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">300</span><span class="token punctuation">, </span></span><span class="parameter ">height<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">300</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/graphics/Bitmap.html">Bitmap</a></div><div class="brief "><p class="paragraph">Generates a QR code bitmap from the provided data string.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2024 Copyright</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

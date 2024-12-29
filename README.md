@@ -1,11 +1,12 @@
 # **CryptoKit**
 
 ![Purpose](https://img.shields.io/badge/purpose-cryptographic%20library-blue)
-![Status](https://img.shields.io/badge/status-active-brightgreen)
-![Last Commit](https://img.shields.io/github/last-commit/RomanTsisyk/CryptoKit)
 ![Docs](https://img.shields.io/badge/docs-up--to--date-brightgreen)
 ![OpenSSF Best Practices](https://bestpractices.coreinfrastructure.org/projects/1/badge)
 [![Known Vulnerabilities](https://snyk.io/test/github/RomanTsisyk/CryptoKit/badge.svg)](https://snyk.io/test/github/RomanTsisyk/CryptoKit)
+
+![Status](https://img.shields.io/badge/status-active-brightgreen)
+![Last Commit](https://img.shields.io/github/last-commit/RomanTsisyk/CryptoKit)
 ![GitHub stars](https://img.shields.io/github/stars/RomanTsisyk/CryptoKit?style=social)
 ![Contributors](https://img.shields.io/github/contributors/RomanTsisyk/CryptoKit)
 
@@ -23,23 +24,28 @@
 
 ---
 
-## **Documentation**
-Explore the detailed documentation on the [CryptoKit Wiki](https://github.com/RomanTsisyk/CryptoKit/wiki):
+## CryptoLib Documentation
 
-1. **[AES Encryption and Decryption](https://github.com/RomanTsisyk/CryptoKit/wiki/01-AES-Encryption-and-Decryption)**  
-   Secure your data using AES-GCM with Base64 encoding.
+CryptoLib provides a comprehensive set of cryptographic operations, and with this release, we have also generated full API documentation to help developers integrate it into their projects seamlessly. 
 
-2. **[RSA Encryption and Decryption](https://github.com/RomanTsisyk/CryptoKit/wiki/02.-RSA-Encryption-and-Decryption)**  
-   Encrypt small payloads with RSA-OAEP for secure communication.
+The documentation covers the following:
 
-3. **[Digital Signatures](https://github.com/RomanTsisyk/CryptoKit/wiki/03.-Digital-Signatures)**  
-   Sign and verify data for integrity and authenticity.
+- **Key Management**: Generate, retrieve, and delete keys securely from the Keystore.
+- **Cryptographic Operations**: Encrypt, decrypt, and sign data with ease.
+- **Error Handling**: Detailed error messages and exception handling tailored to cryptographic operations.
+- **Usage Examples**: Simple, easy-to-follow examples to get started quickly.
 
-4. **[QR Code Integration](https://github.com/RomanTsisyk/CryptoKit/wiki/04.-QR-Code-Integration)**  
-   Generate and decode secure QR codes for data handling.
+You can access the full documentation [here](docs), which includes:
 
-5. **[Key Management](https://github.com/RomanTsisyk/CryptoKit/wiki/05.-Key-Management)**  
-   Manage, store, and rotate cryptographic keys seamlessly.
+- Function and method signatures
+- Descriptions of parameters and return values
+- Exception handling details
+- Code examples for various use cases
 
+## 🚀 Get Started
+
+1. Clone this repository.
+2. Check out the `docs/` folder for local documentation.
+3. Refer to the API docs for in-depth technical details on each class and method.
 
 ---
