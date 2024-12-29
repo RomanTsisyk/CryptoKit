@@ -10,7 +10,7 @@ import com.google.zxing.qrcode.QRCodeReader
  * Class responsible for scanning and decoding QR codes from a bitmap.
  * This uses the ZXing library to decode QR codes.
  */
-class QRCodeScanner {
+object QRCodeScanner {
 
     /**
      * Decodes the QR code from the provided Bitmap.
