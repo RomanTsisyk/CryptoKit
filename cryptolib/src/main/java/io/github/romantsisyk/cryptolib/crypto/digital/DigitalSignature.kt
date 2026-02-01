@@ -1,3 +1,5 @@
+package io.github.romantsisyk.cryptolib.crypto.digital
+
 import java.util.Base64
 import java.security.KeyPair
 import java.security.KeyPairGenerator
@@ -21,6 +23,7 @@ object DigitalSignature {
     /**
      * Signs data using RSA or EC private key.
      */
+    @JvmStatic
     fun sign(data: ByteArray, privateKey: PrivateKey): String {
         val algorithm = when (privateKey.algorithm) {
             "RSA" -> SIGNATURE_ALGORITHM_RSA
@@ -38,6 +41,7 @@ object DigitalSignature {
     /**
      * Verifies a signature using RSA or EC public key.
      */
+    @JvmStatic
     fun verify(data: ByteArray, signatureStr: String, publicKey: PublicKey): Boolean {
         val algorithm = when (publicKey.algorithm) {
             "RSA" -> SIGNATURE_ALGORITHM_RSA
@@ -56,6 +60,7 @@ object DigitalSignature {
      * Generates a key pair for RSA or ECDSA signing.
      * Defaults to RSA.
      */
+    @JvmStatic
     fun generateKeyPair(algorithm: String = "RSA"): KeyPair {
         val keyPairGenerator = KeyPairGenerator.getInstance(algorithm)
         val keySize = when (algorithm) {

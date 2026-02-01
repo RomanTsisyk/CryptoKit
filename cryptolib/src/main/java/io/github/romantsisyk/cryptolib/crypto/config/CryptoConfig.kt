@@ -65,12 +65,27 @@ class CryptoConfig private constructor(
          * Build the [CryptoConfig] object with the set properties.
          *
          * @return A new [CryptoConfig] instance.
+         * @throws IllegalArgumentException if validation fails for any of the configuration properties.
          */
-        fun build() = CryptoConfig(
-            keyAlias,
-            requireUserAuthentication,
-            keyRotationIntervalDays,
-            keyValidityDays
-        )
+        fun build(): CryptoConfig {
+            require(keyAlias.isNotBlank()) {
+                "keyAlias cannot be empty or blank"
+            }
+            require(keyRotationIntervalDays > 0) {
+                "keyRotationIntervalDays must be greater than 0, but was $keyRotationIntervalDays"
+            }
+            require(keyValidityDays > 0) {
+                "keyValidityDays must be greater than 0, but was $keyValidityDays"
+            }
+            require(keyRotationIntervalDays <= keyValidityDays) {
+                "keyRotationIntervalDays ($keyRotationIntervalDays) must be less than or equal to keyValidityDays ($keyValidityDays)"
+            }
+            return CryptoConfig(
+                keyAlias,
+                requireUserAuthentication,
+                keyRotationIntervalDays,
+                keyValidityDays
+            )
+        }
     }
 }

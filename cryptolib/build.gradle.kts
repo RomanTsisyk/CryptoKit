@@ -10,6 +10,7 @@ android {
 
     defaultConfig {
         minSdk = 30
+        targetSdk = 35
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -35,13 +36,13 @@ android {
 
 dependencies {
 
-    implementation ("org.bouncycastle:bcprov-jdk15on:1.70")
+    implementation ("org.bouncycastle:bcprov-jdk18on:1.78.1")
 
     // ZXing library for QR Code processing
     implementation ("com.google.zxing:core:3.5.3")
 
     // Android Biometric dependencies
-    implementation ("androidx.biometric:biometric:1.4.0-alpha02")
+    implementation ("androidx.biometric:biometric:1.2.0-alpha05")
 
     // Security and cryptographic libraries
     implementation ("androidx.security:security-crypto:1.1.0-alpha06")

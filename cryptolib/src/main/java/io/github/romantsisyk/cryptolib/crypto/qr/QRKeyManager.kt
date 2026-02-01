@@ -18,6 +18,7 @@ object QRKeyManager {
      * The key is stored in the Android Keystore for secure access.
      * @return A SecretKey object for encryption.
      */
+    @JvmStatic
     fun generateKey(): SecretKey {
         val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
         keyGenerator.init(
@@ -35,10 +36,13 @@ object QRKeyManager {
     /**
      * Retrieves the encryption key from the Android Keystore.
      * @return The SecretKey stored in the Keystore.
+     * @throws IllegalStateException if the key is not found or is not a valid SecretKey.
      */
+    @JvmStatic
     fun getKey(): SecretKey {
         val keyStore = java.security.KeyStore.getInstance("AndroidKeyStore")
         keyStore.load(null)
-        return keyStore.getKey(ALIAS, null) as SecretKey
+        return keyStore.getKey(ALIAS, null) as? SecretKey
+            ?: throw IllegalStateException("Key with alias '$ALIAS' not found or is not a valid SecretKey")
     }
 }

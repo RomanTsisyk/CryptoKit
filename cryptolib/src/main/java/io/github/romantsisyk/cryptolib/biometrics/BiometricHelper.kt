@@ -1,18 +1,26 @@
+package io.github.romantsisyk.cryptolib.biometrics
+
 import android.content.Context
 import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.FragmentActivity
-import io.github.romantsisyk.cryptolib.crypto.aes.AESEncryption
 import io.github.romantsisyk.cryptolib.crypto.keymanagement.KeyHelper
+import java.util.Base64
 import javax.crypto.Cipher
+import javax.crypto.spec.GCMParameterSpec
 
 class BiometricHelper(private val context: Context) {
+
+    companion object {
+        private const val IV_SIZE = 12 // IV size for AES-GCM (in bytes)
+        private const val TAG_SIZE = 128 // Tag size for GCM mode (in bits)
+    }
 
     /**
      * Authenticates the user using biometric data (e.g., fingerprint) and optionally decrypts encrypted data after successful authentication.
      * Provides success and error callbacks for handling decryption and authentication results.
      *
      * @param activity The activity where the biometric prompt will be displayed.
-     * @param encryptedData The encrypted data to be decrypted upon successful authentication.
+     * @param encryptedData The Base64-encoded encrypted data (IV prepended) to be decrypted upon successful authentication.
      * @param title The title displayed on the biometric prompt.
      * @param description The description displayed on the biometric prompt.
      * @param onSuccess Callback invoked with decrypted data on successful authentication.
@@ -28,6 +36,21 @@ class BiometricHelper(private val context: Context) {
         onError: (Exception) -> Unit,
         onAuthenticationError: (Int, CharSequence) -> Unit
     ) {
+        // Extract IV from the encrypted data (first 12 bytes after Base64 decoding)
+        val encryptedBytes = try {
+            Base64.getDecoder().decode(encryptedData)
+        } catch (e: Exception) {
+            onError(IllegalArgumentException("Invalid Base64-encoded encrypted data", e))
+            return
+        }
+
+        if (encryptedBytes.size < IV_SIZE) {
+            onError(IllegalArgumentException("Encrypted data is too short to contain IV"))
+            return
+        }
+
+        val iv = encryptedBytes.copyOfRange(0, IV_SIZE)
+
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle(title)
             .setDescription(description)
@@ -42,18 +65,19 @@ class BiometricHelper(private val context: Context) {
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
                     try {
-                        // Decrypt the data using the authenticated cipher
-                        val decryptedData = result.cryptoObject?.cipher?.let {
-                            AESEncryption.decrypt(
-                                encryptedData.toString(Charsets.UTF_8),
-                                KeyHelper.getKey()
-                            )
+                        // Get the authenticated cipher from the CryptoObject
+                        val cipher = result.cryptoObject?.cipher
+                        if (cipher == null) {
+                            onError(Exception("Authenticated cipher is null"))
+                            return
                         }
-                        if (decryptedData != null) {
-                            onSuccess(decryptedData) // Handle success
-                        } else {
-                            onError(Exception("Decryption returned null")) // Handle decryption failure
-                        }
+
+                        // Extract the ciphertext (excluding the IV prefix which was already used during cipher initialization)
+                        val ciphertext = encryptedBytes.copyOfRange(IV_SIZE, encryptedBytes.size)
+
+                        // Decrypt using the authenticated cipher
+                        val decryptedData = cipher.doFinal(ciphertext)
+                        onSuccess(decryptedData) // Handle success
                     } catch (e: Exception) {
                         onError(e) // Handle exception
                     }
@@ -71,39 +95,29 @@ class BiometricHelper(private val context: Context) {
             }
         )
 
-        val cipher = getCipher() // Initialize cipher for decryption
+        val cipher = getCipher(iv) // Initialize cipher for decryption with IV
         val cryptoObject = BiometricPrompt.CryptoObject(cipher)
 
         biometricPrompt.authenticate(promptInfo, cryptoObject) // Start authentication
     }
 
     /**
-     * Initializes a Cipher object for AES decryption.
-     * The cipher is initialized with the secure key and is used to decrypt data.
+     * Initializes a Cipher object for AES-GCM decryption with the provided IV.
+     * The cipher is initialized with the secure key and IV, and is used to decrypt data.
      *
-     * @return A Cipher initialized in DECRYPT_MODE.
+     * @param iv The Initialization Vector (IV) extracted from the encrypted data.
+     * @return A Cipher initialized in DECRYPT_MODE with the provided IV.
      * @throws IllegalStateException if initialization fails.
      */
-    private fun getCipher(): Cipher {
+    private fun getCipher(iv: ByteArray): Cipher {
         return try {
             val secretKey = KeyHelper.getKey() // Retrieve the secure key from KeyHelper
             val cipher = Cipher.getInstance("AES/GCM/NoPadding") // AES GCM mode
-            cipher.init(Cipher.DECRYPT_MODE, secretKey) // Initialize cipher for decryption
+            val spec = GCMParameterSpec(TAG_SIZE, iv) // Create GCM parameter spec with IV
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, spec) // Initialize cipher for decryption with IV
             cipher
         } catch (e: Exception) {
             throw IllegalStateException("Failed to initialize Cipher", e) // Handle initialization failure
         }
-    }
-
-    /**
-     * Decrypts the provided encrypted data using the specified Cipher.
-     * This method is invoked as part of the decryption process after successful authentication.
-     *
-     * @param cipher The Cipher used for decryption.
-     * @param encryptedData The encrypted data to decrypt.
-     * @return The decrypted data as a ByteArray.
-     */
-    private fun decryptData(cipher: Cipher, encryptedData: ByteArray): ByteArray {
-        return cipher.doFinal(encryptedData) // Perform decryption
     }
 }

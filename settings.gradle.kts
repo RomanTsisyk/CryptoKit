@@ -19,5 +19,5 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "KeyHelper"
+rootProject.name = "CryptoKit"
 include(":cryptolib")

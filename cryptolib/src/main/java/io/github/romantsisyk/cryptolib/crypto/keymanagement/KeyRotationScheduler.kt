@@ -20,6 +20,7 @@ object KeyRotationScheduler {
      *
      * @param context the application context needed to enqueue the work.
      */
+    @JvmStatic
     fun scheduleKeyRotation(context: Context) {
         val rotationWork = PeriodicWorkRequestBuilder<KeyRotationWorker>(7, TimeUnit.DAYS) // Check every week
             .setConstraints(

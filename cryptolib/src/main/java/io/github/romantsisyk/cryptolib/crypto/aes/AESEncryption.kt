@@ -20,6 +20,19 @@ object AESEncryption {
     private const val KEY_SIZE = 256 // Key size (in bits)
 
     /**
+     * Shared SecureRandom instance for generating cryptographically secure random values.
+     * Uses getInstanceStrong() to ensure the strongest available algorithm is used,
+     * with a fallback to the default SecureRandom if strong instance is unavailable.
+     */
+    private val secureRandom: SecureRandom by lazy {
+        try {
+            SecureRandom.getInstanceStrong()
+        } catch (e: Exception) {
+            SecureRandom()
+        }
+    }
+
+    /**
      * Encrypts the provided plaintext using AES-GCM encryption.
      *
      * @param plaintext The data to be encrypted in ByteArray format.
@@ -27,13 +40,18 @@ object AESEncryption {
      * @return A Base64-encoded string containing the IV and the ciphertext.
      * @throws CryptoOperationException if the encryption process fails.
      */
+    @JvmStatic
     fun encrypt(plaintext: ByteArray, key: SecretKey): String {
+        if (plaintext.isEmpty()) {
+            throw CryptoOperationException("Encryption failed: plaintext cannot be empty")
+        }
+
         return try {
             val cipher = Cipher.getInstance(TRANSFORMATION)
 
-            // Generate a random IV (Initialization Vector)
+            // Generate a random IV (Initialization Vector) using the shared SecureRandom instance
             val iv = ByteArray(IV_SIZE)
-            SecureRandom().nextBytes(iv)
+            secureRandom.nextBytes(iv)
             val spec = GCMParameterSpec(TAG_SIZE, iv)
 
             // Initialize the cipher for encryption and perform the encryption
@@ -58,10 +76,25 @@ object AESEncryption {
      * @return The decrypted data as a ByteArray.
      * @throws CryptoOperationException if the decryption process fails.
      */
+    @JvmStatic
     fun decrypt(encryptedData: String, key: SecretKey): ByteArray {
-        return try {
-            val encryptedBytes = Base64.getDecoder().decode(encryptedData)
+        if (encryptedData.isEmpty()) {
+            throw CryptoOperationException("Decryption failed: encrypted data cannot be empty")
+        }
 
+        val encryptedBytes = try {
+            Base64.getDecoder().decode(encryptedData)
+        } catch (e: IllegalArgumentException) {
+            throw CryptoOperationException("Decryption failed: invalid Base64 encoding", e)
+        }
+
+        if (encryptedBytes.size < IV_SIZE) {
+            throw CryptoOperationException(
+                "Decryption failed: encrypted data is too short (minimum $IV_SIZE bytes required for IV)"
+            )
+        }
+
+        return try {
             // Extract IV and ciphertext from the encrypted data
             val iv = encryptedBytes.copyOfRange(0, IV_SIZE)
             val ciphertext = encryptedBytes.copyOfRange(IV_SIZE, encryptedBytes.size)
@@ -71,6 +104,8 @@ object AESEncryption {
             val cipher = Cipher.getInstance(TRANSFORMATION)
             cipher.init(Cipher.DECRYPT_MODE, key, spec)
             cipher.doFinal(ciphertext)
+        } catch (e: CryptoOperationException) {
+            throw e
         } catch (e: Exception) {
             throw CryptoOperationException("Decryption", e)
         }
@@ -81,6 +116,7 @@ object AESEncryption {
      *
      * @return A newly generated AES SecretKey.
      */
+    @JvmStatic
     fun generateKey(): SecretKey {
         val keyGenerator = KeyGenerator.getInstance("AES")
         keyGenerator.init(KEY_SIZE)

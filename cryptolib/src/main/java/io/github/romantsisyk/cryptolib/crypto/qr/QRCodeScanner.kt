@@ -19,6 +19,7 @@ object QRCodeScanner {
      * @return The string content of the decoded QR code.
      * @throws IllegalArgumentException If the QR code cannot be decoded.
      */
+    @JvmStatic
     fun decodeQRCode(bitmap: Bitmap): String {
         try {
             val luminanceSource = BitmapLuminanceSource(bitmap)

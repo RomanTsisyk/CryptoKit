@@ -30,6 +30,7 @@ object KeyHelper {
      * @param requireUserAuthentication if set to true, the key requires user authentication to use.
      * @throws KeyGenerationException if key generation fails.
      */
+    @JvmStatic
     fun generateAESKey(
         alias: String,
         validityDays: Int = 365,
@@ -75,6 +76,7 @@ object KeyHelper {
      *
      * @param alias the alias used to reference the key pair.
      */
+    @JvmStatic
     fun generateRSAKeyPair(alias: String) {
         val keyPairGenerator = KeyPairGenerator.getInstance(
             KeyProperties.KEY_ALGORITHM_RSA,
@@ -104,6 +106,7 @@ object KeyHelper {
      *
      * @param alias the alias used to reference the key pair.
      */
+    @JvmStatic
     fun generateECKeyPair(alias: String) {
         val keyPairGenerator = KeyPairGenerator.getInstance(
             KeyProperties.KEY_ALGORITHM_EC,
@@ -132,6 +135,7 @@ object KeyHelper {
      * @return the SecretKey instance.
      * @throws KeyNotFoundException if the key is not found.
      */
+    @JvmStatic
     fun getAESKey(alias: String): SecretKey {
         val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
         val key = keyStore.getKey(alias, null) as? SecretKey
@@ -146,6 +150,7 @@ object KeyHelper {
      * @return the PrivateKey if found, or null if the key is not present in the Keystore.
      * @throws KeyNotFoundException if the private key is not found in the Keystore.
      */
+    @JvmStatic
     fun getPrivateKey(alias: String): PrivateKey? {
         val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE)
         keyStore.load(null)
@@ -160,6 +165,7 @@ object KeyHelper {
      * @return the PublicKey if found, or null if the key is not present in the Keystore.
      * @throws KeyNotFoundException if the public key is not found in the Keystore.
      */
+    @JvmStatic
     fun getPublicKey(alias: String): PublicKey? {
         val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE)
         keyStore.load(null)
@@ -172,6 +178,7 @@ object KeyHelper {
      *
      * @return a list of key aliases stored in the Keystore.
      */
+    @JvmStatic
     fun listKeys(): List<String> {
         val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
         val aliases = keyStore.aliases()
@@ -188,6 +195,7 @@ object KeyHelper {
      * @param alias the alias of the key to be deleted.
      * @throws KeyNotFoundException if the key does not exist in the Keystore.
      */
+    @JvmStatic
     fun deleteKey(alias: String) {
         val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
         if (keyStore.containsAlias(alias)) {
@@ -205,6 +213,7 @@ object KeyHelper {
      * @throws KeyNotFoundException if the key does not exist.
      * @throws CryptoLibException if unable to retrieve the KeyInfo.
      */
+    @JvmStatic
     fun getKeyInfo(alias: String): KeyInfo {
         val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
         val entry = keyStore.getEntry(alias, null) as? KeyStore.SecretKeyEntry
@@ -221,12 +230,14 @@ object KeyHelper {
      * @return the existing or newly generated SecretKey.
      * @throws KeyGenerationException if the key generation fails.
      */
+    @JvmStatic
     fun getOrCreateSecretKey(): SecretKey {
         val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
 
         // Check if the key already exists
         if (keyStore.containsAlias(KEY_ALIAS)) {
-            return keyStore.getKey(KEY_ALIAS, null) as SecretKey
+            return keyStore.getKey(KEY_ALIAS, null) as? SecretKey
+                ?: throw KeyNotFoundException(KEY_ALIAS)
         }
 
         // Generate a new secret key
@@ -250,6 +261,7 @@ object KeyHelper {
      * @return the Cipher instance used for encryption/decryption.
      * @throws IllegalStateException if unable to retrieve the Cipher instance.
      */
+    @JvmStatic
     fun getCipherInstance(): Cipher {
         return try {
             Cipher.getInstance(TRANSFORMATION)
@@ -264,10 +276,12 @@ object KeyHelper {
      * @return the SecretKey associated with the provided alias.
      * @throws KeyNotFoundException if the key cannot be found.
      */
+    @JvmStatic
     fun getKey(): SecretKey {
-        val keyStore = java.security.KeyStore.getInstance("AndroidKeyStore")
+        val keyStore = java.security.KeyStore.getInstance(ANDROID_KEYSTORE)
         keyStore.load(null)
-        return keyStore.getKey("MySecureKey", null) as SecretKey
+        return keyStore.getKey(KEY_ALIAS, null) as? SecretKey
+            ?: throw KeyNotFoundException(KEY_ALIAS)
     }
 
 }

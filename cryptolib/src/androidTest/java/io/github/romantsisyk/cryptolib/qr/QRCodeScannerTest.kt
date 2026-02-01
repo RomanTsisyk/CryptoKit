@@ -5,7 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.github.romantsisyk.cryptolib.crypto.qr.QRCodeGenerator
 import io.github.romantsisyk.cryptolib.crypto.qr.QRCodeScanner
 import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertNull
+import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -22,7 +22,8 @@ class QRCodeScannerTest {
     @Test
     fun testDecodeQRCodeInvalid() {
         val bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
-        val result = QRCodeScanner.decodeQRCode(bitmap)
-        assertNull(result)
+        assertThrows(IllegalArgumentException::class.java) {
+            QRCodeScanner.decodeQRCode(bitmap)
+        }
     }
 }
