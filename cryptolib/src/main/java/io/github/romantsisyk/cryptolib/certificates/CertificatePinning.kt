@@ -1,6 +1,7 @@
 package io.github.romantsisyk.cryptolib.certificates
 
 import io.github.romantsisyk.cryptolib.exceptions.CertificateException
+import java.security.MessageDigest
 import java.security.cert.X509Certificate
 import java.util.concurrent.ConcurrentHashMap
 
@@ -87,7 +88,10 @@ object CertificatePinning {
             throw CertificateException("Failed to calculate certificate fingerprint for pin verification", e)
         }
 
-        return expectedPin.equals(actualPin, ignoreCase = true)
+        return MessageDigest.isEqual(
+            expectedPin.uppercase().toByteArray(),
+            actualPin.uppercase().toByteArray()
+        )
     }
 
     /**

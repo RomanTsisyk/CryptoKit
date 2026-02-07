@@ -79,7 +79,7 @@ class JWTValidatorTest {
             .setSubject("test-subject")
             .sign(key, JWTAlgorithm.HS256)
 
-        assertTrue(JWTValidator.validate(token, key))
+        assertTrue(JWTValidator.validate(token, key, JWTAlgorithm.HS256))
     }
 
     @Test
@@ -90,7 +90,7 @@ class JWTValidatorTest {
             .setSubject("test-subject")
             .sign(key, JWTAlgorithm.HS256)
 
-        assertFalse(JWTValidator.validate(token, wrongKey))
+        assertFalse(JWTValidator.validate(token, wrongKey, JWTAlgorithm.HS256))
     }
 
     @Test
@@ -100,7 +100,7 @@ class JWTValidatorTest {
             .setSubject("test-subject")
             .sign(keyPair.private, JWTAlgorithm.RS256)
 
-        assertTrue(JWTValidator.validate(token, keyPair.public))
+        assertTrue(JWTValidator.validate(token, keyPair.public, JWTAlgorithm.RS256))
     }
 
     @Test
@@ -111,7 +111,7 @@ class JWTValidatorTest {
             .setSubject("test-subject")
             .sign(keyPair1.private, JWTAlgorithm.RS256)
 
-        assertFalse(JWTValidator.validate(token, keyPair2.public))
+        assertFalse(JWTValidator.validate(token, keyPair2.public, JWTAlgorithm.RS256))
     }
 
     @Test
@@ -120,7 +120,7 @@ class JWTValidatorTest {
         val invalidToken = "invalid.token"
 
         assertThrows(TokenException::class.java) {
-            JWTValidator.validate(invalidToken, key)
+            JWTValidator.validate(invalidToken, key, JWTAlgorithm.HS256)
         }
     }
 
@@ -134,7 +134,7 @@ class JWTValidatorTest {
             .setSubject("test-subject")
             .sign(key, JWTAlgorithm.HS384)
 
-        assertTrue(JWTValidator.validate(token, key))
+        assertTrue(JWTValidator.validate(token, key, JWTAlgorithm.HS384))
     }
 
     @Test
@@ -147,7 +147,7 @@ class JWTValidatorTest {
             .setSubject("test-subject")
             .sign(key, JWTAlgorithm.HS512)
 
-        assertTrue(JWTValidator.validate(token, key))
+        assertTrue(JWTValidator.validate(token, key, JWTAlgorithm.HS512))
     }
 
     @Test
@@ -157,7 +157,7 @@ class JWTValidatorTest {
             .setSubject("test-subject")
             .sign(keyPair.private, JWTAlgorithm.RS384)
 
-        assertTrue(JWTValidator.validate(token, keyPair.public))
+        assertTrue(JWTValidator.validate(token, keyPair.public, JWTAlgorithm.RS384))
     }
 
     @Test
@@ -167,7 +167,7 @@ class JWTValidatorTest {
             .setSubject("test-subject")
             .sign(keyPair.private, JWTAlgorithm.RS512)
 
-        assertTrue(JWTValidator.validate(token, keyPair.public))
+        assertTrue(JWTValidator.validate(token, keyPair.public, JWTAlgorithm.RS512))
     }
 
     @Test
@@ -256,7 +256,7 @@ class JWTValidatorTest {
             .setExpiration(futureTime)
             .sign(key, JWTAlgorithm.HS256)
 
-        assertTrue(JWTValidator.validateWithExpiry(token, key))
+        assertTrue(JWTValidator.validateWithExpiry(token, key, expectedAlgorithm = JWTAlgorithm.HS256))
     }
 
     @Test
@@ -269,7 +269,7 @@ class JWTValidatorTest {
             .sign(key, JWTAlgorithm.HS256)
 
         assertThrows(TokenException::class.java) {
-            JWTValidator.validateWithExpiry(token, key)
+            JWTValidator.validateWithExpiry(token, key, expectedAlgorithm = JWTAlgorithm.HS256)
         }
     }
 
@@ -282,7 +282,7 @@ class JWTValidatorTest {
             .setExpiration(pastTime)
             .sign(key, JWTAlgorithm.HS256)
 
-        assertTrue(JWTValidator.validateWithExpiry(token, key, allowExpired = true))
+        assertTrue(JWTValidator.validateWithExpiry(token, key, allowExpired = true, expectedAlgorithm = JWTAlgorithm.HS256))
     }
 
     @Test
@@ -295,7 +295,7 @@ class JWTValidatorTest {
             .sign(key, JWTAlgorithm.HS256)
 
         assertThrows(TokenException::class.java) {
-            JWTValidator.validateWithExpiry(token, key)
+            JWTValidator.validateWithExpiry(token, key, expectedAlgorithm = JWTAlgorithm.HS256)
         }
     }
 
@@ -307,7 +307,7 @@ class JWTValidatorTest {
             .setSubject("test-subject")
             .sign(key, JWTAlgorithm.HS256)
 
-        assertFalse(JWTValidator.validateWithExpiry(token, wrongKey))
+        assertFalse(JWTValidator.validateWithExpiry(token, wrongKey, expectedAlgorithm = JWTAlgorithm.HS256))
     }
 
     @Test
@@ -326,7 +326,7 @@ class JWTValidatorTest {
             .sign(key, JWTAlgorithm.HS256)
 
         // Validate token
-        assertTrue(JWTValidator.validate(token, key))
+        assertTrue(JWTValidator.validate(token, key, JWTAlgorithm.HS256))
 
         // Parse and verify claims
         val payload = JWTValidator.parse(token)
@@ -344,6 +344,183 @@ class JWTValidatorTest {
         assertEquals("admin", JWTValidator.getClaim(token, "role"))
     }
 
+    // ==================== Algorithm confusion attack tests ====================
+
+    @Test
+    fun `test validate rejects token when header alg does not match expectedAlgorithm`() {
+        val key = generateHmacKey()
+        val token = JWTBuilder()
+            .setSubject("test-subject")
+            .sign(key, JWTAlgorithm.HS256)
+
+        assertThrows(TokenException::class.java) {
+            JWTValidator.validate(token, key, expectedAlgorithm = JWTAlgorithm.HS512)
+        }
+    }
+
+    @Test
+    fun `test validate succeeds when header alg matches expectedAlgorithm`() {
+        val key = generateHmacKey()
+        val token = JWTBuilder()
+            .setSubject("test-subject")
+            .sign(key, JWTAlgorithm.HS256)
+
+        assertTrue(JWTValidator.validate(token, key, expectedAlgorithm = JWTAlgorithm.HS256))
+    }
+
+    @Test
+    fun `test validate rejects HMAC token with wrong key type`() {
+        val hmacKey = generateHmacKey()
+        val rsaKeyPair = generateRsaKeyPair()
+        val token = JWTBuilder()
+            .setSubject("test-subject")
+            .sign(hmacKey, JWTAlgorithm.HS256)
+
+        // Attempt to verify HMAC token with an RSA PublicKey should fail with clear error
+        assertThrows(TokenException::class.java) {
+            JWTValidator.validate(token, rsaKeyPair.public, expectedAlgorithm = JWTAlgorithm.HS256)
+        }
+    }
+
+    @Test
+    fun `test validate rejects RSA token with wrong key type`() {
+        val rsaKeyPair = generateRsaKeyPair()
+        val hmacKey = generateHmacKey()
+        val token = JWTBuilder()
+            .setSubject("test-subject")
+            .sign(rsaKeyPair.private, JWTAlgorithm.RS256)
+
+        // Attempt to verify RSA token with an HMAC SecretKey should fail with clear error
+        assertThrows(TokenException::class.java) {
+            JWTValidator.validate(token, hmacKey, expectedAlgorithm = JWTAlgorithm.RS256)
+        }
+    }
+
+    @Test
+    fun `test validate rejects token with unsupported algorithm in header`() {
+        // Craft a token with alg=none by manual Base64 encoding
+        val headerJson = """{"alg":"none","typ":"JWT"}"""
+        val payloadJson = """{"sub":"test"}"""
+        val encoder = java.util.Base64.getUrlEncoder().withoutPadding()
+        val header = encoder.encodeToString(headerJson.toByteArray())
+        val payload = encoder.encodeToString(payloadJson.toByteArray())
+        val token = "$header.$payload."
+
+        val key = generateHmacKey()
+        assertThrows(TokenException::class.java) {
+            JWTValidator.validate(token, key, JWTAlgorithm.HS256)
+        }
+    }
+
+    @Test
+    fun `test validate detects tampered payload`() {
+        val key = generateHmacKey()
+        val token = JWTBuilder()
+            .setSubject("original-subject")
+            .sign(key, JWTAlgorithm.HS256)
+
+        // Tamper with the payload: replace the middle part
+        val parts = token.split(".")
+        val tamperedPayloadJson = """{"sub":"tampered-subject"}"""
+        val encoder = java.util.Base64.getUrlEncoder().withoutPadding()
+        val tamperedPayload = encoder.encodeToString(tamperedPayloadJson.toByteArray())
+        val tamperedToken = "${parts[0]}.$tamperedPayload.${parts[2]}"
+
+        assertFalse(JWTValidator.validate(tamperedToken, key, expectedAlgorithm = JWTAlgorithm.HS256))
+    }
+
+    @Test
+    fun `test validateWithExpiry with expectedAlgorithm`() {
+        val key = generateHmacKey()
+        val futureTime = Date(System.currentTimeMillis() + 3600000)
+        val token = JWTBuilder()
+            .setSubject("test-subject")
+            .setExpiration(futureTime)
+            .sign(key, JWTAlgorithm.HS256)
+
+        assertTrue(JWTValidator.validateWithExpiry(token, key, expectedAlgorithm = JWTAlgorithm.HS256))
+
+        assertThrows(TokenException::class.java) {
+            JWTValidator.validateWithExpiry(token, key, expectedAlgorithm = JWTAlgorithm.RS256)
+        }
+    }
+
+    @Test
+    fun `test validate rejects HMAC token verified with RSA key`() {
+        val hmacKey = generateHmacKey()
+        val rsaKeyPair = generateRsaKeyPair()
+        val token = JWTBuilder()
+            .setSubject("test-subject")
+            .sign(hmacKey, JWTAlgorithm.HS256)
+
+        // Token header says HS256 but we pass an RSA PublicKey — should reject due to key type mismatch
+        assertThrows(TokenException::class.java) {
+            JWTValidator.validate(token, rsaKeyPair.public, JWTAlgorithm.HS256)
+        }
+    }
+
+    @Test
+    fun `test validate rejects RSA token verified with HMAC key`() {
+        val rsaKeyPair = generateRsaKeyPair()
+        val hmacKey = generateHmacKey()
+        val token = JWTBuilder()
+            .setSubject("test-subject")
+            .sign(rsaKeyPair.private, JWTAlgorithm.RS256)
+
+        // Token header says RS256 but we pass an HMAC SecretKey — should reject due to key type mismatch
+        assertThrows(TokenException::class.java) {
+            JWTValidator.validate(token, hmacKey, JWTAlgorithm.RS256)
+        }
+    }
+
+    @Test
+    fun `test JWTBuilder sign rejects HMAC algorithm with RSA key`() {
+        val rsaKeyPair = generateRsaKeyPair()
+
+        assertThrows(TokenException::class.java) {
+            JWTBuilder()
+                .setSubject("test-subject")
+                .sign(rsaKeyPair.public, JWTAlgorithm.HS256)
+        }
+    }
+
+    @Test
+    fun `test JWTBuilder sign rejects RSA algorithm with HMAC key`() {
+        val hmacKey = generateHmacKey()
+
+        assertThrows(TokenException::class.java) {
+            JWTBuilder()
+                .setSubject("test-subject")
+                .sign(hmacKey, JWTAlgorithm.RS256)
+        }
+    }
+
+    @Test
+    fun `test algorithm confusion attack HMAC key used as RSA public key is rejected`() {
+        // Simulate algorithm confusion: attacker signs with HMAC using the RSA public key bytes
+        // The validator should reject this because key types don't match the algorithm
+        val rsaKeyPair = generateRsaKeyPair()
+
+        // Create a legitimate RSA token
+        val token = JWTBuilder()
+            .setSubject("admin")
+            .sign(rsaKeyPair.private, JWTAlgorithm.RS256)
+
+        // Validate with correct key and pinned algorithm — should pass
+        assertTrue(JWTValidator.validate(token, rsaKeyPair.public, expectedAlgorithm = JWTAlgorithm.RS256))
+
+        // If attacker re-signs with HS256 using public key material, the validator
+        // should reject when expectedAlgorithm is pinned to RS256
+        val hmacKey = generateHmacKey()
+        val attackerToken = JWTBuilder()
+            .setSubject("admin")
+            .sign(hmacKey, JWTAlgorithm.HS256)
+
+        assertThrows(TokenException::class.java) {
+            JWTValidator.validate(attackerToken, rsaKeyPair.public, expectedAlgorithm = JWTAlgorithm.RS256)
+        }
+    }
+
     @Test
     fun `test complete JWT lifecycle with RSA`() {
         val keyPair = generateRsaKeyPair()
@@ -357,7 +534,7 @@ class JWTValidatorTest {
             .sign(keyPair.private, JWTAlgorithm.RS256)
 
         // Validate token
-        assertTrue(JWTValidator.validate(token, keyPair.public))
+        assertTrue(JWTValidator.validate(token, keyPair.public, JWTAlgorithm.RS256))
 
         // Parse and verify claims
         val payload = JWTValidator.parse(token)
@@ -366,6 +543,6 @@ class JWTValidatorTest {
 
         // Verify wrong key fails
         val wrongKeyPair = generateRsaKeyPair()
-        assertFalse(JWTValidator.validate(token, wrongKeyPair.public))
+        assertFalse(JWTValidator.validate(token, wrongKeyPair.public, JWTAlgorithm.RS256))
     }
 }

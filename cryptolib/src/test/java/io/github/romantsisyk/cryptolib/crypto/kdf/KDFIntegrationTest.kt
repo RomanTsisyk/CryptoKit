@@ -55,7 +55,7 @@ class KDFIntegrationTest {
 
         // 2. Derive key and generate salt
         val config = KDFConfig.Builder()
-            .iterations(150000)
+            .iterations(650_000)
             .algorithm(KDFAlgorithm.PBKDF2_SHA512)
             .build()
         val (registrationKey, registrationSalt) = KeyDerivation.deriveKeyWithNewSalt(userPassword, config)
@@ -228,7 +228,7 @@ class KDFIntegrationTest {
     @Test
     fun `test password strength affects security posture`() {
         val weakPassword = "pass"
-        val strongPassword = "MyV3ry$tr0ng&P@ssw0rd123!"
+        val strongPassword = "MyV3ry\$tr0ng&P@ssw0rd123!"
 
         // Check strengths
         val weakStrength = PasswordStrengthChecker.checkStrength(weakPassword)

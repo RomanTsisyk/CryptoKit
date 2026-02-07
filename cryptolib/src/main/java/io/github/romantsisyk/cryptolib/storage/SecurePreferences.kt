@@ -7,6 +7,7 @@ import io.github.romantsisyk.cryptolib.crypto.keymanagement.KeyHelper
 import io.github.romantsisyk.cryptolib.exceptions.CryptoOperationException
 import java.util.Base64
 import javax.crypto.SecretKey
+import kotlin.concurrent.withLock
 
 /**
  * Encrypted SharedPreferences wrapper for secure data persistence.
@@ -37,21 +38,23 @@ class SecurePreferences(
      * @throws CryptoOperationException if key initialization fails.
      */
     private fun initializeKey(): SecretKey {
-        return try {
-            // Try to get existing key
+        return KeyHelper.lockForAlias(keyAlias).withLock {
             try {
-                KeyHelper.getAESKey(keyAlias)
+                // Try to get existing key
+                try {
+                    KeyHelper.getAESKey(keyAlias)
+                } catch (e: Exception) {
+                    // Key doesn't exist, generate a new one
+                    KeyHelper.generateAESKey(
+                        alias = keyAlias,
+                        validityDays = 3650, // 10 years
+                        requireUserAuthentication = false
+                    )
+                    KeyHelper.getAESKey(keyAlias)
+                }
             } catch (e: Exception) {
-                // Key doesn't exist, generate a new one
-                KeyHelper.generateAESKey(
-                    alias = keyAlias,
-                    validityDays = 3650, // 10 years
-                    requireUserAuthentication = false
-                )
-                KeyHelper.getAESKey(keyAlias)
+                throw CryptoOperationException("Failed to initialize encryption key", e)
             }
-        } catch (e: Exception) {
-            throw CryptoOperationException("Failed to initialize encryption key", e)
         }
     }
 

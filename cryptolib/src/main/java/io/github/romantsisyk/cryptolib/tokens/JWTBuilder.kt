@@ -185,8 +185,20 @@ class JWTBuilder {
             val payloadJson = payload.toJson()
             val encodedPayload = base64UrlEncode(payloadJson.toByteArray())
 
-            // Create signature
+            // Create signature — validate key type before casting
             val dataToSign = "$encodedHeader.$encodedPayload"
+            if (algorithm.isHmac() && key !is SecretKey) {
+                throw TokenException(
+                    "HMAC algorithm ${algorithm.algorithmName} requires a SecretKey, " +
+                        "but got ${key::class.java.simpleName}"
+                )
+            }
+            if (algorithm.isRsa() && key !is PrivateKey) {
+                throw TokenException(
+                    "RSA algorithm ${algorithm.algorithmName} requires a PrivateKey, " +
+                        "but got ${key::class.java.simpleName}"
+                )
+            }
             val signature = when {
                 algorithm.isHmac() -> signHmac(dataToSign, key as SecretKey, algorithm)
                 algorithm.isRsa() -> signRsa(dataToSign, key as PrivateKey, algorithm)

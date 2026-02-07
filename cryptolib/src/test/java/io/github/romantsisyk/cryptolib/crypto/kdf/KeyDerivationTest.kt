@@ -98,8 +98,8 @@ class KeyDerivationTest {
         val password = "TestPassword".toCharArray()
         val salt = KeyDerivation.generateSalt()
 
-        val config1 = KDFConfig.Builder().iterations(100000).build()
-        val config2 = KDFConfig.Builder().iterations(200000).build()
+        val config1 = KDFConfig.Builder().iterations(600_000).build()
+        val config2 = KDFConfig.Builder().iterations(700_000).build()
 
         val key1 = KeyDerivation.deriveKey(password, salt, config1)
         val key2 = KeyDerivation.deriveKey(password, salt, config2)

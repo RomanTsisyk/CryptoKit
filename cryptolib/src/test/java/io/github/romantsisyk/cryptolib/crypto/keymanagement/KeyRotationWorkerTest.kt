@@ -4,10 +4,8 @@ import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkObject
-import io.mockk.runs
 import io.mockk.unmockkObject
 import io.mockk.verify
 import org.junit.After
@@ -41,7 +39,9 @@ class KeyRotationWorkerTest {
         // Arrange
         val keys = listOf("key1", "key2", "key3")
         every { KeyHelper.listKeys() } returns keys
-        every { KeyRotationManager.rotateKeyIfNeeded(any()) } just runs
+        every { KeyRotationManager.safeRotate("key1") } returns KeyRotationResult.NotNeeded
+        every { KeyRotationManager.safeRotate("key2") } returns KeyRotationResult.NotNeeded
+        every { KeyRotationManager.safeRotate("key3") } returns KeyRotationResult.NotNeeded
 
         val worker = KeyRotationWorker(context, workerParams)
 
@@ -51,9 +51,9 @@ class KeyRotationWorkerTest {
         // Assert
         assertEquals(ListenableWorker.Result.success(), result)
         verify(exactly = 1) { KeyHelper.listKeys() }
-        verify(exactly = 3) { KeyRotationManager.rotateKeyIfNeeded(any()) }
+        verify(exactly = 3) { KeyRotationManager.safeRotate(any()) }
         keys.forEach { alias ->
-            verify(exactly = 1) { KeyRotationManager.rotateKeyIfNeeded(alias) }
+            verify(exactly = 1) { KeyRotationManager.safeRotate(alias) }
         }
     }
 
@@ -62,7 +62,7 @@ class KeyRotationWorkerTest {
         // Arrange
         val keys = listOf("single_key")
         every { KeyHelper.listKeys() } returns keys
-        every { KeyRotationManager.rotateKeyIfNeeded(any()) } just runs
+        every { KeyRotationManager.safeRotate("single_key") } returns KeyRotationResult.NotNeeded
 
         val worker = KeyRotationWorker(context, workerParams)
 
@@ -71,7 +71,23 @@ class KeyRotationWorkerTest {
 
         // Assert
         assertEquals(ListenableWorker.Result.success(), result)
-        verify(exactly = 1) { KeyRotationManager.rotateKeyIfNeeded("single_key") }
+        verify(exactly = 1) { KeyRotationManager.safeRotate("single_key") }
+    }
+
+    @Test
+    fun `doWork should return success when rotation produces Success result`() {
+        // Arrange
+        val keys = listOf("key1")
+        every { KeyHelper.listKeys() } returns keys
+        every { KeyRotationManager.safeRotate("key1") } returns KeyRotationResult.Success("key1", "key1_v2")
+
+        val worker = KeyRotationWorker(context, workerParams)
+
+        // Act
+        val result = worker.doWork()
+
+        // Assert
+        assertEquals(ListenableWorker.Result.success(), result)
     }
 
     // ==================== Test: doWork returns retry when some rotations fail (under 3 attempts) ====================
@@ -81,9 +97,9 @@ class KeyRotationWorkerTest {
         // Arrange
         val keys = listOf("key1", "key2", "key3")
         every { KeyHelper.listKeys() } returns keys
-        every { KeyRotationManager.rotateKeyIfNeeded("key1") } just runs
-        every { KeyRotationManager.rotateKeyIfNeeded("key2") } throws RuntimeException("Rotation failed")
-        every { KeyRotationManager.rotateKeyIfNeeded("key3") } just runs
+        every { KeyRotationManager.safeRotate("key1") } returns KeyRotationResult.NotNeeded
+        every { KeyRotationManager.safeRotate("key2") } returns KeyRotationResult.Failure("key2", RuntimeException("Rotation failed"))
+        every { KeyRotationManager.safeRotate("key3") } returns KeyRotationResult.NotNeeded
         every { workerParams.runAttemptCount } returns 0
 
         val worker = KeyRotationWorker(context, workerParams)
@@ -100,7 +116,7 @@ class KeyRotationWorkerTest {
         // Arrange
         val keys = listOf("key1", "key2")
         every { KeyHelper.listKeys() } returns keys
-        every { KeyRotationManager.rotateKeyIfNeeded(any()) } throws RuntimeException("Rotation failed")
+        every { KeyRotationManager.safeRotate(any()) } returns KeyRotationResult.Failure("key", RuntimeException("Rotation failed"))
         every { workerParams.runAttemptCount } returns 1
 
         val worker = KeyRotationWorker(context, workerParams)
@@ -117,8 +133,8 @@ class KeyRotationWorkerTest {
         // Arrange
         val keys = listOf("key1", "key2")
         every { KeyHelper.listKeys() } returns keys
-        every { KeyRotationManager.rotateKeyIfNeeded("key1") } just runs
-        every { KeyRotationManager.rotateKeyIfNeeded("key2") } throws RuntimeException("Rotation failed")
+        every { KeyRotationManager.safeRotate("key1") } returns KeyRotationResult.NotNeeded
+        every { KeyRotationManager.safeRotate("key2") } returns KeyRotationResult.Failure("key2", RuntimeException("Rotation failed"))
         every { workerParams.runAttemptCount } returns 2
 
         val worker = KeyRotationWorker(context, workerParams)
@@ -137,8 +153,8 @@ class KeyRotationWorkerTest {
         // Arrange
         val keys = listOf("key1", "key2")
         every { KeyHelper.listKeys() } returns keys
-        every { KeyRotationManager.rotateKeyIfNeeded("key1") } just runs
-        every { KeyRotationManager.rotateKeyIfNeeded("key2") } throws RuntimeException("Rotation failed")
+        every { KeyRotationManager.safeRotate("key1") } returns KeyRotationResult.NotNeeded
+        every { KeyRotationManager.safeRotate("key2") } returns KeyRotationResult.Failure("key2", RuntimeException("Rotation failed"))
         every { workerParams.runAttemptCount } returns 3
 
         val worker = KeyRotationWorker(context, workerParams)
@@ -155,7 +171,7 @@ class KeyRotationWorkerTest {
         // Arrange
         val keys = listOf("key1")
         every { KeyHelper.listKeys() } returns keys
-        every { KeyRotationManager.rotateKeyIfNeeded(any()) } throws RuntimeException("Rotation failed")
+        every { KeyRotationManager.safeRotate(any()) } returns KeyRotationResult.Failure("key1", RuntimeException("Rotation failed"))
         every { workerParams.runAttemptCount } returns 5
 
         val worker = KeyRotationWorker(context, workerParams)
@@ -172,7 +188,7 @@ class KeyRotationWorkerTest {
         // Arrange
         val keys = listOf("key1", "key2", "key3")
         every { KeyHelper.listKeys() } returns keys
-        every { KeyRotationManager.rotateKeyIfNeeded(any()) } throws RuntimeException("Rotation failed")
+        every { KeyRotationManager.safeRotate(any()) } returns KeyRotationResult.Failure("key", RuntimeException("Rotation failed"))
         every { workerParams.runAttemptCount } returns 4
 
         val worker = KeyRotationWorker(context, workerParams)
@@ -182,7 +198,7 @@ class KeyRotationWorkerTest {
 
         // Assert
         assertEquals(ListenableWorker.Result.failure(), result)
-        verify(exactly = 3) { KeyRotationManager.rotateKeyIfNeeded(any()) }
+        verify(exactly = 3) { KeyRotationManager.safeRotate(any()) }
     }
 
     // ==================== Test: doWork handles empty key list ====================
@@ -200,7 +216,7 @@ class KeyRotationWorkerTest {
         // Assert
         assertEquals(ListenableWorker.Result.success(), result)
         verify(exactly = 1) { KeyHelper.listKeys() }
-        verify(exactly = 0) { KeyRotationManager.rotateKeyIfNeeded(any()) }
+        verify(exactly = 0) { KeyRotationManager.safeRotate(any()) }
     }
 
     // ==================== Test: doWork handles exception from KeyHelper.listKeys() ====================
@@ -218,7 +234,7 @@ class KeyRotationWorkerTest {
         // Assert
         assertEquals(ListenableWorker.Result.retry(), result)
         verify(exactly = 1) { KeyHelper.listKeys() }
-        verify(exactly = 0) { KeyRotationManager.rotateKeyIfNeeded(any()) }
+        verify(exactly = 0) { KeyRotationManager.safeRotate(any()) }
     }
 
     @Test
@@ -256,10 +272,10 @@ class KeyRotationWorkerTest {
         // Arrange: 2 successes and 2 failures
         val keys = listOf("key1", "key2", "key3", "key4")
         every { KeyHelper.listKeys() } returns keys
-        every { KeyRotationManager.rotateKeyIfNeeded("key1") } just runs
-        every { KeyRotationManager.rotateKeyIfNeeded("key2") } throws RuntimeException("Failed")
-        every { KeyRotationManager.rotateKeyIfNeeded("key3") } just runs
-        every { KeyRotationManager.rotateKeyIfNeeded("key4") } throws RuntimeException("Failed")
+        every { KeyRotationManager.safeRotate("key1") } returns KeyRotationResult.NotNeeded
+        every { KeyRotationManager.safeRotate("key2") } returns KeyRotationResult.Failure("key2", RuntimeException("Failed"))
+        every { KeyRotationManager.safeRotate("key3") } returns KeyRotationResult.NotNeeded
+        every { KeyRotationManager.safeRotate("key4") } returns KeyRotationResult.Failure("key4", RuntimeException("Failed"))
         every { workerParams.runAttemptCount } returns 1
 
         val worker = KeyRotationWorker(context, workerParams)
@@ -269,7 +285,7 @@ class KeyRotationWorkerTest {
 
         // Assert
         assertEquals(ListenableWorker.Result.retry(), result)
-        verify(exactly = 4) { KeyRotationManager.rotateKeyIfNeeded(any()) }
+        verify(exactly = 4) { KeyRotationManager.safeRotate(any()) }
     }
 
     @Test
@@ -277,9 +293,9 @@ class KeyRotationWorkerTest {
         // Arrange
         val keys = listOf("key1", "key2", "key3")
         every { KeyHelper.listKeys() } returns keys
-        every { KeyRotationManager.rotateKeyIfNeeded("key1") } throws RuntimeException("Failed")
-        every { KeyRotationManager.rotateKeyIfNeeded("key2") } just runs
-        every { KeyRotationManager.rotateKeyIfNeeded("key3") } just runs
+        every { KeyRotationManager.safeRotate("key1") } returns KeyRotationResult.Failure("key1", RuntimeException("Failed"))
+        every { KeyRotationManager.safeRotate("key2") } returns KeyRotationResult.NotNeeded
+        every { KeyRotationManager.safeRotate("key3") } returns KeyRotationResult.NotNeeded
         every { workerParams.runAttemptCount } returns 0
 
         val worker = KeyRotationWorker(context, workerParams)
@@ -290,9 +306,9 @@ class KeyRotationWorkerTest {
         // Assert
         assertEquals(ListenableWorker.Result.retry(), result)
         // Verify all keys were processed despite first failure
-        verify(exactly = 1) { KeyRotationManager.rotateKeyIfNeeded("key1") }
-        verify(exactly = 1) { KeyRotationManager.rotateKeyIfNeeded("key2") }
-        verify(exactly = 1) { KeyRotationManager.rotateKeyIfNeeded("key3") }
+        verify(exactly = 1) { KeyRotationManager.safeRotate("key1") }
+        verify(exactly = 1) { KeyRotationManager.safeRotate("key2") }
+        verify(exactly = 1) { KeyRotationManager.safeRotate("key3") }
     }
 
     @Test
@@ -300,9 +316,9 @@ class KeyRotationWorkerTest {
         // Arrange
         val keys = listOf("key1", "key2", "key3")
         every { KeyHelper.listKeys() } returns keys
-        every { KeyRotationManager.rotateKeyIfNeeded("key1") } just runs
-        every { KeyRotationManager.rotateKeyIfNeeded("key2") } just runs
-        every { KeyRotationManager.rotateKeyIfNeeded("key3") } throws RuntimeException("Failed")
+        every { KeyRotationManager.safeRotate("key1") } returns KeyRotationResult.NotNeeded
+        every { KeyRotationManager.safeRotate("key2") } returns KeyRotationResult.NotNeeded
+        every { KeyRotationManager.safeRotate("key3") } returns KeyRotationResult.Failure("key3", RuntimeException("Failed"))
         every { workerParams.runAttemptCount } returns 0
 
         val worker = KeyRotationWorker(context, workerParams)
@@ -312,6 +328,6 @@ class KeyRotationWorkerTest {
 
         // Assert
         assertEquals(ListenableWorker.Result.retry(), result)
-        verify(exactly = 3) { KeyRotationManager.rotateKeyIfNeeded(any()) }
+        verify(exactly = 3) { KeyRotationManager.safeRotate(any()) }
     }
 }

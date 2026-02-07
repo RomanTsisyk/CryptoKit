@@ -67,7 +67,7 @@ Before submitting, please search existing issues to ensure the feature has not a
 
 - JDK 17 or higher
 - Android Studio (latest stable version recommended)
-- Android SDK with API level 21 or higher
+- Android SDK with API level 30 or higher
 - Git
 
 ### Getting Started

@@ -45,7 +45,7 @@ class PasswordStrengthCheckerTest {
 
     @Test
     fun `test checkStrength returns VERY_STRONG for excellent password`() {
-        val strength = PasswordStrengthChecker.checkStrength("MyV3ry$tr0ng&C0mpl3xP@ssw0rd!")
+        val strength = PasswordStrengthChecker.checkStrength("MyV3ry\$tr0ng&C0mpl3xP@ssw0rd!")
         assertEquals(PasswordStrength.VERY_STRONG, strength)
     }
 
@@ -295,7 +295,7 @@ class PasswordStrengthCheckerTest {
         val weak = PasswordStrengthChecker.checkStrength("pass")
         val fair = PasswordStrengthChecker.checkStrength("Password1")
         val strong = PasswordStrengthChecker.checkStrength("P@ssw0rd123")
-        val veryStrong = PasswordStrengthChecker.checkStrength("MyV3ry$tr0ng&C0mpl3xP@ssw0rd!")
+        val veryStrong = PasswordStrengthChecker.checkStrength("MyV3ry\$tr0ng&C0mpl3xP@ssw0rd!")
 
         assertTrue(weak.ordinal < fair.ordinal || weak == PasswordStrength.WEAK)
         assertTrue(fair.ordinal < strong.ordinal || fair.ordinal <= PasswordStrength.FAIR.ordinal)

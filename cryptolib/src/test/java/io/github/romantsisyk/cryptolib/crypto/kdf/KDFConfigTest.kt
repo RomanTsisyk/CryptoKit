@@ -19,7 +19,7 @@ class KDFConfigTest {
     fun `test getDefault creates valid config`() {
         val config = KDFConfig.getDefault()
 
-        assertEquals(100000, config.iterations)
+        assertEquals(600_000, config.iterations)
         assertEquals(256, config.keyLength)
         assertEquals(KDFAlgorithm.PBKDF2_SHA256, config.algorithm)
     }
@@ -27,10 +27,10 @@ class KDFConfigTest {
     @Test
     fun `test builder with custom iterations`() {
         val config = KDFConfig.Builder()
-            .iterations(200000)
+            .iterations(700_000)
             .build()
 
-        assertEquals(200000, config.iterations)
+        assertEquals(700_000, config.iterations)
     }
 
     @Test
@@ -54,12 +54,12 @@ class KDFConfigTest {
     @Test
     fun `test builder with all custom values`() {
         val config = KDFConfig.Builder()
-            .iterations(150000)
+            .iterations(650_000)
             .keyLength(384)
             .algorithm(KDFAlgorithm.PBKDF2_SHA512)
             .build()
 
-        assertEquals(150000, config.iterations)
+        assertEquals(650_000, config.iterations)
         assertEquals(384, config.keyLength)
         assertEquals(KDFAlgorithm.PBKDF2_SHA512, config.algorithm)
     }
@@ -155,12 +155,12 @@ class KDFConfigTest {
     @Test
     fun `test builder fluent interface chaining`() {
         val config = KDFConfig.Builder()
-            .iterations(120000)
+            .iterations(620_000)
             .keyLength(256)
             .algorithm(KDFAlgorithm.PBKDF2_SHA512)
             .build()
 
-        assertEquals(120000, config.iterations)
+        assertEquals(620_000, config.iterations)
         assertEquals(256, config.keyLength)
         assertEquals(KDFAlgorithm.PBKDF2_SHA512, config.algorithm)
     }

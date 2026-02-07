@@ -2,6 +2,7 @@ package io.github.romantsisyk.cryptolib.crypto.qr
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import io.github.romantsisyk.cryptolib.exceptions.KeyNotFoundException
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 
@@ -36,13 +37,13 @@ object QRKeyManager {
     /**
      * Retrieves the encryption key from the Android Keystore.
      * @return The SecretKey stored in the Keystore.
-     * @throws IllegalStateException if the key is not found or is not a valid SecretKey.
+     * @throws KeyNotFoundException if the key is not found or is not a valid SecretKey.
      */
     @JvmStatic
     fun getKey(): SecretKey {
         val keyStore = java.security.KeyStore.getInstance("AndroidKeyStore")
         keyStore.load(null)
         return keyStore.getKey(ALIAS, null) as? SecretKey
-            ?: throw IllegalStateException("Key with alias '$ALIAS' not found or is not a valid SecretKey")
+            ?: throw KeyNotFoundException(ALIAS)
     }
 }

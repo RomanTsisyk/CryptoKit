@@ -107,7 +107,10 @@ object ChecksumUtils {
     @JvmStatic
     fun verifyChecksum(data: ByteArray, expectedChecksum: String, algorithm: ChecksumAlgorithm): Boolean {
         val actualChecksum = calculateChecksum(data, algorithm)
-        return actualChecksum.equals(expectedChecksum, ignoreCase = true)
+        return MessageDigest.isEqual(
+            actualChecksum.lowercase().toByteArray(),
+            expectedChecksum.lowercase().toByteArray()
+        )
     }
 
     /**
@@ -122,7 +125,10 @@ object ChecksumUtils {
     @JvmStatic
     fun verifyChecksum(file: File, expectedChecksum: String, algorithm: ChecksumAlgorithm): Boolean {
         val actualChecksum = calculateChecksum(file, algorithm)
-        return actualChecksum.equals(expectedChecksum, ignoreCase = true)
+        return MessageDigest.isEqual(
+            actualChecksum.lowercase().toByteArray(),
+            expectedChecksum.lowercase().toByteArray()
+        )
     }
 
     // Private helper methods

@@ -31,12 +31,16 @@ class KeyRotationWorker(appContext: Context, workerParams: WorkerParameters) :
             Log.d(TAG, "Starting key rotation check for ${keys.size} keys")
 
             keys.forEach { alias ->
-                try {
-                    KeyRotationManager.rotateKeyIfNeeded(alias)
-                    successfulRotations++
-                } catch (e: Exception) {
-                    Log.e(TAG, "Failed to rotate key '$alias': ${e.message}", e)
-                    failedRotations++
+                when (val result = KeyRotationManager.safeRotate(alias)) {
+                    is KeyRotationResult.NotNeeded -> successfulRotations++
+                    is KeyRotationResult.Success -> {
+                        Log.d(TAG, "Key '${result.oldAlias}' rotated to '${result.newAlias}'")
+                        successfulRotations++
+                    }
+                    is KeyRotationResult.Failure -> {
+                        Log.e(TAG, "Failed to rotate key '${result.alias}': ${result.exception.message}", result.exception)
+                        failedRotations++
+                    }
                 }
             }
         } catch (e: Exception) {

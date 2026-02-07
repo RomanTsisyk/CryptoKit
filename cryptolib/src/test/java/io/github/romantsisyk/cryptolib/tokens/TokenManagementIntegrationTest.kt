@@ -50,7 +50,7 @@ class TokenManagementIntegrationTest {
         assertNotNull(token)
 
         // Step 2: Validate token on subsequent requests
-        assertTrue(JWTValidator.validate(token, key))
+        assertTrue(JWTValidator.validate(token, key, JWTAlgorithm.HS256))
         assertFalse(JWTValidator.isExpired(token))
 
         // Step 3: Extract user information from token
@@ -77,7 +77,7 @@ class TokenManagementIntegrationTest {
             .sign(key, JWTAlgorithm.HS256)
 
         // Step 2: Validate access token
-        assertTrue(JWTValidator.validate(accessToken, key))
+        assertTrue(JWTValidator.validate(accessToken, key, JWTAlgorithm.HS256))
 
         // Step 3: Simulate token refresh
         // In real scenario, refreshToken would be stored securely and validated
@@ -88,7 +88,7 @@ class TokenManagementIntegrationTest {
             .addClaim("refreshedFrom", refreshToken)
             .sign(key, JWTAlgorithm.HS256)
 
-        assertTrue(JWTValidator.validate(newAccessToken, key))
+        assertTrue(JWTValidator.validate(newAccessToken, key, JWTAlgorithm.HS256))
         assertEquals("access", JWTValidator.getClaim(newAccessToken, "type"))
     }
 
@@ -134,7 +134,7 @@ class TokenManagementIntegrationTest {
             .sign(keyPair.private, JWTAlgorithm.RS256)
 
         // Service B validates the JWT using Service A's public key
-        assertTrue(JWTValidator.validate(token, keyPair.public))
+        assertTrue(JWTValidator.validate(token, keyPair.public, JWTAlgorithm.RS256))
 
         val payload = JWTValidator.parse(token)
         assertEquals(serviceId, payload.iss)
@@ -155,18 +155,18 @@ class TokenManagementIntegrationTest {
             .sign(key, JWTAlgorithm.HS256)
 
         // Signature is still valid
-        assertTrue(JWTValidator.validate(expiredToken, key))
+        assertTrue(JWTValidator.validate(expiredToken, key, JWTAlgorithm.HS256))
 
         // But token is expired
         assertTrue(JWTValidator.isExpired(expiredToken))
 
         // validateWithExpiry should throw exception
         assertThrows(TokenException::class.java) {
-            JWTValidator.validateWithExpiry(expiredToken, key)
+            JWTValidator.validateWithExpiry(expiredToken, key, expectedAlgorithm = JWTAlgorithm.HS256)
         }
 
         // Can allow expired tokens if needed
-        assertTrue(JWTValidator.validateWithExpiry(expiredToken, key, allowExpired = true))
+        assertTrue(JWTValidator.validateWithExpiry(expiredToken, key, allowExpired = true, expectedAlgorithm = JWTAlgorithm.HS256))
     }
 
     @Test
@@ -181,7 +181,7 @@ class TokenManagementIntegrationTest {
             .sign(key, JWTAlgorithm.HS256)
 
         // Signature is valid
-        assertTrue(JWTValidator.validate(futureToken, key))
+        assertTrue(JWTValidator.validate(futureToken, key, JWTAlgorithm.HS256))
 
         // But token is not yet valid
         val payload = JWTValidator.parse(futureToken)
@@ -189,7 +189,7 @@ class TokenManagementIntegrationTest {
 
         // validateWithExpiry should throw exception
         assertThrows(TokenException::class.java) {
-            JWTValidator.validateWithExpiry(futureToken, key)
+            JWTValidator.validateWithExpiry(futureToken, key, expectedAlgorithm = JWTAlgorithm.HS256)
         }
     }
 
@@ -213,8 +213,8 @@ class TokenManagementIntegrationTest {
             .sign(rsaKeyPair.private, JWTAlgorithm.RS256)
 
         // Validate each with appropriate key
-        assertTrue(JWTValidator.validate(tenant1Token, hmacKey))
-        assertTrue(JWTValidator.validate(tenant2Token, rsaKeyPair.public))
+        assertTrue(JWTValidator.validate(tenant1Token, hmacKey, JWTAlgorithm.HS256))
+        assertTrue(JWTValidator.validate(tenant2Token, rsaKeyPair.public, JWTAlgorithm.RS256))
 
         // Check headers to determine algorithm
         val header1 = JWTValidator.parseHeader(tenant1Token)
@@ -273,7 +273,7 @@ class TokenManagementIntegrationTest {
             .sign(key, JWTAlgorithm.HS256)
 
         // Full validation
-        assertTrue(JWTValidator.validateWithExpiry(token, key))
+        assertTrue(JWTValidator.validateWithExpiry(token, key, expectedAlgorithm = JWTAlgorithm.HS256))
 
         // Verify all claims
         val allClaims = JWTValidator.getAllClaims(token)
@@ -299,7 +299,7 @@ class TokenManagementIntegrationTest {
         val tamperedToken = "${parts[0]}.${parts[1].dropLast(1)}X.${parts[2]}"
 
         // Validation should fail
-        assertFalse(JWTValidator.validate(tamperedToken, key))
+        assertFalse(JWTValidator.validate(tamperedToken, key, JWTAlgorithm.HS256))
     }
 
     private fun assertNotEquals(expected: Any?, actual: Any?) {

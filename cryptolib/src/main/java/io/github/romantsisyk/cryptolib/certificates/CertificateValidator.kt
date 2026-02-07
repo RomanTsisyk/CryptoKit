@@ -174,13 +174,9 @@ object CertificateValidator {
      */
     @JvmStatic
     fun checkRevocation(cert: X509Certificate): Boolean {
-        // TODO: Implement OCSP or CRL checking
-        // This would require:
-        // 1. Extracting the OCSP responder URL from the certificate's AIA extension
-        // 2. Making an OCSP request to check the certificate status
-        // 3. Or downloading and checking the CRL if OCSP is not available
-
-        // For now, return false (not revoked) as a placeholder
-        return false
+        throw NotImplementedError(
+            "Certificate revocation checking (OCSP/CRL) is not yet implemented. " +
+                "Do not rely on this method for production certificate validation."
+        )
     }
 }

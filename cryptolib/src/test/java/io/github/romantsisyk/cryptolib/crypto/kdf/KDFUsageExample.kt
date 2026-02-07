@@ -12,7 +12,7 @@ class KDFUsageExample {
 
     @Test
     fun `example 1 - basic key derivation with default settings`() {
-        // Use default configuration (PBKDF2-SHA256, 100,000 iterations, 256-bit key)
+        // Use default configuration (PBKDF2-SHA256, 600,000 iterations, 256-bit key)
         val config = KDFConfig.getDefault()
 
         // Derive a key from a password
@@ -82,7 +82,7 @@ class KDFUsageExample {
             "password",           // Weak
             "Password1",          // Fair
             "MyP@ssw0rd123",     // Strong
-            "MyV3ry$tr0ng&C0mpl3xP@ssw0rd!"  // Very Strong
+            "MyV3ry\$tr0ng&C0mpl3xP@ssw0rd!"  // Very Strong
         )
 
         passwords.forEach { password ->

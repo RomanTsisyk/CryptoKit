@@ -83,14 +83,15 @@ class KDFConfig private constructor(
 
     companion object {
         /**
-         * Default number of iterations (100,000 is recommended by OWASP as of 2023).
+         * Default number of iterations (600,000 for PBKDF2-HMAC-SHA256 per OWASP 2023 guidelines).
+         * See: https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
          */
-        const val DEFAULT_ITERATIONS = 100000
+        const val DEFAULT_ITERATIONS = 600_000
 
         /**
-         * Minimum recommended iterations for security.
+         * Minimum recommended iterations for security (210,000 per OWASP 2023 for PBKDF2-HMAC-SHA512).
          */
-        const val MIN_ITERATIONS = 10000
+        const val MIN_ITERATIONS = 210_000
 
         /**
          * Default key length in bits (256 bits = 32 bytes).

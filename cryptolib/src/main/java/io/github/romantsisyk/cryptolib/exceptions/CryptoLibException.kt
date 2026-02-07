@@ -1,6 +1,7 @@
 package io.github.romantsisyk.cryptolib.exceptions
 
 /**
- * Base exception class for all exceptions in the CryptoLib library.
+ * Sealed base exception class for all exceptions in the CryptoLib library.
+ * Enables exhaustive `when` matching on exception subtypes.
  */
-open class CryptoLibException(message: String, cause: Throwable? = null) : Exception(message, cause)
+sealed class CryptoLibException(message: String, cause: Throwable? = null) : Exception(message, cause)

@@ -4,6 +4,21 @@ import android.util.Log
 import io.github.romantsisyk.cryptolib.exceptions.KeyGenerationException
 import java.util.Calendar
 import java.util.Date
+import kotlin.concurrent.withLock
+
+/**
+ * Result of a safe key rotation attempt.
+ */
+sealed class KeyRotationResult {
+    /** Key does not need rotation yet. */
+    object NotNeeded : KeyRotationResult()
+
+    /** Key was successfully rotated to a new versioned alias. */
+    data class Success(val oldAlias: String, val newAlias: String) : KeyRotationResult()
+
+    /** Key rotation failed. */
+    data class Failure(val alias: String, val exception: Exception) : KeyRotationResult()
+}
 
 /**
  * Manages the rotation of cryptographic keys, ensuring they are rotated after a specific interval or when the key is expired.
@@ -15,34 +30,77 @@ object KeyRotationManager {
     private const val ROTATION_INTERVAL_DAYS = 90 // Interval in days for automatic key rotation
 
     /**
+     * Safely rotates the cryptographic key if it has expired or is within the proactive
+     * rotation window (90 days before expiry). Generates a new AES key under a versioned
+     * alias, keeping the old key intact for decryption of existing data.
+     * Returns a result indicating the outcome.
+     *
+     * @param alias The alias identifying the key to rotate.
+     * @return A [KeyRotationResult] indicating the outcome.
+     */
+    @JvmStatic
+    fun safeRotate(alias: String): KeyRotationResult {
+        // Lock the alias to prevent two concurrent rotations from computing
+        // the same nextVersionedAlias and overwriting each other's key.
+        return KeyHelper.lockForAlias(alias).withLock {
+            try {
+                val keyInfo = KeyHelper.getKeyInfo(alias)
+                val keyValidityEndDate = keyInfo.keyValidityForOriginationEnd
+                    ?: return@withLock KeyRotationResult.NotNeeded
+
+                val currentDate = Date()
+
+                if (!shouldRotateKey(currentDate, keyValidityEndDate)) {
+                    val rotationDate = calculateRotationDate(keyValidityEndDate)
+                    if (!shouldRotateKey(currentDate, rotationDate)) {
+                        Log.d(TAG, "Key '$alias' does not require rotation yet.")
+                        return@withLock KeyRotationResult.NotNeeded
+                    }
+                }
+
+                val newAlias = KeyHelper.nextVersionedAlias(alias)
+                KeyHelper.generateAESKey(newAlias)
+                Log.d(TAG, "Key '$alias' rotated successfully to '$newAlias'.")
+                KeyRotationResult.Success(oldAlias = alias, newAlias = newAlias)
+            } catch (e: Exception) {
+                Log.e(TAG, "Key rotation failed for '$alias': ${e.message}", e)
+                KeyRotationResult.Failure(alias = alias, exception = e)
+            }
+        }
+    }
+
+    /**
      * Rotates the cryptographic key if it has expired or reached the defined rotation interval.
      * Generates a new AES key and deletes the old one after the rotation.
      * Logs success or failure of the key rotation process.
      *
      * @param alias The alias identifying the key to rotate.
      */
+    @Deprecated("Use safeRotate() instead, which preserves the old key and returns a result.", replaceWith = ReplaceWith("safeRotate(alias)"))
     @JvmStatic
     fun rotateKeyIfNeeded(alias: String) {
-        val keyInfo = KeyHelper.getKeyInfo(alias) // Fetch current key information
-        val keyValidityEndDate = keyInfo.keyValidityForOriginationEnd ?: return // No rotation needed if no end date is set
-        val currentDate = Date()
+        KeyHelper.lockForAlias(alias).withLock {
+            val keyInfo = KeyHelper.getKeyInfo(alias) // Fetch current key information
+            val keyValidityEndDate = keyInfo.keyValidityForOriginationEnd ?: return // No rotation needed if no end date is set
+            val currentDate = Date()
 
-        // Check if the key's validity has ended
-        if (shouldRotateKey(currentDate, keyValidityEndDate)) {
-            performKeyRotation(alias, "Key validity expired")
-            return
+            // Check if the key's validity has ended
+            if (shouldRotateKey(currentDate, keyValidityEndDate)) {
+                performKeyRotation(alias, "Key validity expired")
+                return
+            }
+
+            // Check if the key should be rotated after a specific interval (e.g., 90 days)
+            val rotationDate = calculateRotationDate(keyValidityEndDate)
+
+            // If the key is older than the defined rotation date, rotate it
+            if (shouldRotateKey(currentDate, rotationDate)) {
+                performKeyRotation(alias, "Rotation interval exceeded")
+                return
+            }
+
+            Log.d(TAG, "Key '$alias' does not require rotation yet.")
         }
-
-        // Check if the key should be rotated after a specific interval (e.g., 90 days)
-        val rotationDate = calculateRotationDate(keyValidityEndDate)
-
-        // If the key is older than the defined rotation date, rotate it
-        if (shouldRotateKey(currentDate, rotationDate)) {
-            performKeyRotation(alias, "Rotation interval exceeded")
-            return
-        }
-
-        Log.d(TAG, "Key '$alias' does not require rotation yet.")
     }
 
     /**
@@ -57,15 +115,20 @@ object KeyRotationManager {
     }
 
     /**
-     * Calculates the rotation date by adding the rotation interval to the key validity end date.
+     * Calculates the proactive rotation date by subtracting the rotation interval
+     * from the key validity end date. This triggers rotation BEFORE the key expires,
+     * giving time for a smooth transition to the new key.
+     *
+     * For example, with a 90-day rotation interval and a key expiring on day 365,
+     * rotation is triggered on day 275 (365 - 90).
      *
      * @param keyValidityEndDate The key's validity end date.
-     * @return The calculated rotation date.
+     * @return The date at which rotation should begin (before expiry).
      */
     private fun calculateRotationDate(keyValidityEndDate: Date): Date {
         val calendar = Calendar.getInstance()
         calendar.time = keyValidityEndDate
-        calendar.add(Calendar.DAY_OF_YEAR, ROTATION_INTERVAL_DAYS)
+        calendar.add(Calendar.DAY_OF_YEAR, -ROTATION_INTERVAL_DAYS)
         return calendar.time
     }
 
@@ -94,9 +157,13 @@ object KeyRotationManager {
      */
     @JvmStatic
     fun isKeyRotationNeeded(alias: String): Boolean {
-        val keyInfo = KeyHelper.getKeyInfo(alias) ?: return false
-        val keyValidityEndDate = keyInfo.keyValidityForOriginationEnd ?: return false
-        val currentDate = Date()
-        return currentDate.after(keyValidityEndDate) // Check if the current date is after the expiration date
+        return try {
+            val keyInfo = KeyHelper.getKeyInfo(alias)
+            val keyValidityEndDate = keyInfo.keyValidityForOriginationEnd ?: return false
+            val currentDate = Date()
+            currentDate.after(keyValidityEndDate)
+        } catch (e: Exception) {
+            false
+        }
     }
 }

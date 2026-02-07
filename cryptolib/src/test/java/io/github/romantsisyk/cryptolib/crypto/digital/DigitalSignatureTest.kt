@@ -1,5 +1,6 @@
 package io.github.romantsisyk.cryptolib.crypto.digital
 
+import io.github.romantsisyk.cryptolib.exceptions.CryptoOperationException
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -84,8 +85,8 @@ class DigitalSignatureTest {
         assertFalse(DigitalSignature.verify(message, signature, keyPair2.public))
     }
 
-    @Test(expected = UnsupportedOperationException::class)
-    fun `test generateKeyPair with unsupported algorithm throws UnsupportedOperationException`() {
+    @Test(expected = CryptoOperationException::class)
+    fun `test generateKeyPair with unsupported algorithm throws CryptoOperationException`() {
         DigitalSignature.generateKeyPair("DSA")
     }
 }

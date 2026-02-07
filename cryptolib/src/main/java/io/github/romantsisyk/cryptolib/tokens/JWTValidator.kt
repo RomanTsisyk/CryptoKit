@@ -2,6 +2,7 @@ package io.github.romantsisyk.cryptolib.tokens
 
 import io.github.romantsisyk.cryptolib.exceptions.TokenException
 import java.security.Key
+import java.security.MessageDigest
 import java.security.PublicKey
 import java.security.Signature
 import java.util.Base64
@@ -58,13 +59,17 @@ object JWTValidator {
 
     /**
      * Validates a JWT signature using the provided key.
+     *
      * @param token The JWT string to validate.
      * @param key The key to use for validation (SecretKey for HMAC, PublicKey for RSA).
+     * @param expectedAlgorithm The algorithm the token MUST use. If the token header
+     *        specifies a different algorithm, validation fails with [TokenException].
+     *        This parameter is required to prevent algorithm confusion attacks.
      * @return true if the signature is valid, false otherwise.
-     * @throws TokenException if validation fails due to an error.
+     * @throws TokenException if validation fails due to an error or algorithm mismatch.
      */
     @JvmStatic
-    fun validate(token: String, key: Key): Boolean {
+    fun validate(token: String, key: Key, expectedAlgorithm: JWTAlgorithm): Boolean {
         return try {
             val parts = token.split(".")
             if (parts.size != 3) {
@@ -72,13 +77,37 @@ object JWTValidator {
             }
 
             val header = parseHeader(token)
+            val algorithm = header.alg
+
+            // Enforce expected algorithm to prevent algorithm confusion attacks
+            if (algorithm != expectedAlgorithm) {
+                throw TokenException(
+                    "Algorithm mismatch: token specifies ${algorithm.algorithmName} " +
+                        "but expected ${expectedAlgorithm.algorithmName}"
+                )
+            }
+
+            // Validate key type matches algorithm to prevent ClassCastException
+            if (algorithm.isHmac() && key !is SecretKey) {
+                throw TokenException(
+                    "HMAC algorithm ${algorithm.algorithmName} requires a SecretKey, " +
+                        "but got ${key::class.java.simpleName}"
+                )
+            }
+            if (algorithm.isRsa() && key !is PublicKey) {
+                throw TokenException(
+                    "RSA algorithm ${algorithm.algorithmName} requires a PublicKey, " +
+                        "but got ${key::class.java.simpleName}"
+                )
+            }
+
             val dataToVerify = "${parts[0]}.${parts[1]}"
             val signature = base64UrlDecode(parts[2])
 
             when {
-                header.alg.isHmac() -> verifyHmac(dataToVerify, signature, key as SecretKey, header.alg)
-                header.alg.isRsa() -> verifyRsa(dataToVerify, signature, key as PublicKey, header.alg)
-                else -> throw TokenException("Unsupported algorithm: ${header.alg.algorithmName}")
+                algorithm.isHmac() -> verifyHmac(dataToVerify, signature, key as SecretKey, algorithm)
+                algorithm.isRsa() -> verifyRsa(dataToVerify, signature, key as PublicKey, algorithm)
+                else -> throw TokenException("Unsupported algorithm: ${algorithm.algorithmName}")
             }
         } catch (e: TokenException) {
             throw e
@@ -92,12 +121,20 @@ object JWTValidator {
      * @param token The JWT string to validate.
      * @param key The key to use for validation.
      * @param allowExpired If true, doesn't throw exception for expired tokens.
+     * @param expectedAlgorithm The algorithm the token MUST use. Required to prevent
+     *        algorithm confusion attacks.
      * @return true if the token is valid and not expired, false otherwise.
      * @throws TokenException if validation fails.
      */
     @JvmStatic
-    fun validateWithExpiry(token: String, key: Key, allowExpired: Boolean = false): Boolean {
-        val isValid = validate(token, key)
+    @JvmOverloads
+    fun validateWithExpiry(
+        token: String,
+        key: Key,
+        allowExpired: Boolean = false,
+        expectedAlgorithm: JWTAlgorithm
+    ): Boolean {
+        val isValid = validate(token, key, expectedAlgorithm)
         if (!isValid) {
             return false
         }
@@ -181,7 +218,7 @@ object JWTValidator {
         val mac = Mac.getInstance(algorithm.javaAlgorithm)
         mac.init(key)
         val expectedSignature = mac.doFinal(data.toByteArray())
-        return signature.contentEquals(expectedSignature)
+        return MessageDigest.isEqual(signature, expectedSignature)
     }
 
     /**

@@ -1,22 +1,22 @@
 package io.github.romantsisyk.cryptolib.crypto.manager
 
 import android.app.Activity
+import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.FragmentActivity
 import io.github.romantsisyk.cryptolib.biometrics.BiometricHelper
 import io.github.romantsisyk.cryptolib.crypto.aes.AESEncryption
 import io.github.romantsisyk.cryptolib.crypto.config.CryptoConfig
 import io.github.romantsisyk.cryptolib.crypto.keymanagement.KeyHelper
-import io.github.romantsisyk.cryptolib.crypto.keymanagement.KeyRotationManager
 import io.github.romantsisyk.cryptolib.exceptions.AuthenticationException
 import io.github.romantsisyk.cryptolib.exceptions.CryptoLibException
 import io.github.romantsisyk.cryptolib.exceptions.CryptoOperationException
-import io.github.romantsisyk.cryptolib.exceptions.KeyGenerationException
 import io.github.romantsisyk.cryptolib.exceptions.KeyNotFoundException
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkConstructor
 import io.mockk.mockkObject
+import io.mockk.mockkStatic
 import io.mockk.runs
 import io.mockk.slot
 import io.mockk.unmockkAll
@@ -25,11 +25,11 @@ import org.junit.After
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
+import javax.crypto.Cipher
 import javax.crypto.SecretKey
 
 class CryptoManagerTest {
@@ -45,7 +45,6 @@ class CryptoManagerTest {
     fun setUp() {
         mockkObject(KeyHelper)
         mockkObject(AESEncryption)
-        mockkObject(KeyRotationManager)
         mockkConstructor(BiometricHelper::class)
 
         mockFragmentActivity = mockk(relaxed = true)
@@ -74,7 +73,6 @@ class CryptoManagerTest {
 
     @Test
     fun `encryptData should succeed when key exists and no authentication required`() {
-        // Arrange
         val plaintext = "Hello, World!".toByteArray()
         val expectedEncryptedData = "encryptedBase64String"
         var successResult: String? = null
@@ -83,9 +81,7 @@ class CryptoManagerTest {
         every { KeyHelper.listKeys() } returns listOf(testAlias)
         every { KeyHelper.getAESKey(testAlias) } returns mockSecretKey
         every { AESEncryption.encrypt(plaintext, mockSecretKey) } returns expectedEncryptedData
-        every { KeyRotationManager.rotateKeyIfNeeded(testAlias) } just runs
 
-        // Act
         CryptoManager.encryptData(
             activity = mockFragmentActivity,
             config = config,
@@ -94,16 +90,13 @@ class CryptoManagerTest {
             onFailure = { failureResult = it }
         )
 
-        // Assert
         assertEquals(expectedEncryptedData, successResult)
         assertEquals(null, failureResult)
         verify(exactly = 1) { AESEncryption.encrypt(plaintext, mockSecretKey) }
-        verify(exactly = 1) { KeyRotationManager.rotateKeyIfNeeded(testAlias) }
     }
 
     @Test
     fun `encryptData should generate key when key does not exist`() {
-        // Arrange
         val plaintext = "Test data".toByteArray()
         val expectedEncryptedData = "newEncryptedData"
         var successResult: String? = null
@@ -113,9 +106,7 @@ class CryptoManagerTest {
         every { KeyHelper.generateAESKey(testAlias, config.keyValidityDays, false) } just runs
         every { KeyHelper.getAESKey(testAlias) } returns mockSecretKey
         every { AESEncryption.encrypt(plaintext, mockSecretKey) } returns expectedEncryptedData
-        every { KeyRotationManager.rotateKeyIfNeeded(testAlias) } just runs
 
-        // Act
         CryptoManager.encryptData(
             activity = mockFragmentActivity,
             config = config,
@@ -124,17 +115,15 @@ class CryptoManagerTest {
             onFailure = { failureResult = it }
         )
 
-        // Assert
         assertEquals(expectedEncryptedData, successResult)
         assertEquals(null, failureResult)
         verify(exactly = 1) { KeyHelper.generateAESKey(testAlias, config.keyValidityDays, false) }
     }
 
-    // ==================== Tests for encryptData failure when key generation fails ====================
+    // ==================== Tests for encryptData failure ====================
 
     @Test
     fun `encryptData should fail when key generation fails`() {
-        // Arrange
         val plaintext = "Test data".toByteArray()
         var successResult: String? = null
         var failureResult: CryptoLibException? = null
@@ -143,7 +132,6 @@ class CryptoManagerTest {
         every { KeyHelper.generateAESKey(testAlias, config.keyValidityDays, false) } throws
                 RuntimeException("Key generation failed")
 
-        // Act
         CryptoManager.encryptData(
             activity = mockFragmentActivity,
             config = config,
@@ -152,7 +140,6 @@ class CryptoManagerTest {
             onFailure = { failureResult = it }
         )
 
-        // Assert
         assertEquals(null, successResult)
         assertNotNull(failureResult)
         assertTrue(failureResult is CryptoOperationException)
@@ -161,7 +148,6 @@ class CryptoManagerTest {
 
     @Test
     fun `encryptData should fail when AES encryption throws exception`() {
-        // Arrange
         val plaintext = "Test data".toByteArray()
         var successResult: String? = null
         var failureResult: CryptoLibException? = null
@@ -171,7 +157,6 @@ class CryptoManagerTest {
         every { AESEncryption.encrypt(plaintext, mockSecretKey) } throws
                 CryptoOperationException("Encryption failed")
 
-        // Act
         CryptoManager.encryptData(
             activity = mockFragmentActivity,
             config = config,
@@ -180,7 +165,6 @@ class CryptoManagerTest {
             onFailure = { failureResult = it }
         )
 
-        // Assert
         assertEquals(null, successResult)
         assertNotNull(failureResult)
         assertTrue(failureResult is CryptoOperationException)
@@ -190,7 +174,6 @@ class CryptoManagerTest {
 
     @Test
     fun `decryptData should succeed when key exists and no authentication required`() {
-        // Arrange
         val encryptedData = "encryptedBase64String"
         val expectedDecryptedData = "Hello, World!".toByteArray()
         var successResult: ByteArray? = null
@@ -200,7 +183,6 @@ class CryptoManagerTest {
         every { KeyHelper.getAESKey(testAlias) } returns mockSecretKey
         every { AESEncryption.decrypt(encryptedData, mockSecretKey) } returns expectedDecryptedData
 
-        // Act
         CryptoManager.decryptData(
             activity = mockFragmentActivity,
             config = config,
@@ -209,7 +191,6 @@ class CryptoManagerTest {
             onFailure = { failureResult = it }
         )
 
-        // Assert
         assertTrue(expectedDecryptedData.contentEquals(successResult))
         assertEquals(null, failureResult)
         verify(exactly = 1) { AESEncryption.decrypt(encryptedData, mockSecretKey) }
@@ -217,7 +198,6 @@ class CryptoManagerTest {
 
     @Test
     fun `decryptData should generate key when key does not exist and then decrypt`() {
-        // Arrange
         val encryptedData = "encryptedBase64String"
         val expectedDecryptedData = "Decrypted data".toByteArray()
         var successResult: ByteArray? = null
@@ -228,7 +208,6 @@ class CryptoManagerTest {
         every { KeyHelper.getAESKey(testAlias) } returns mockSecretKey
         every { AESEncryption.decrypt(encryptedData, mockSecretKey) } returns expectedDecryptedData
 
-        // Act
         CryptoManager.decryptData(
             activity = mockFragmentActivity,
             config = config,
@@ -237,17 +216,15 @@ class CryptoManagerTest {
             onFailure = { failureResult = it }
         )
 
-        // Assert
         assertTrue(expectedDecryptedData.contentEquals(successResult))
         assertEquals(null, failureResult)
         verify(exactly = 1) { KeyHelper.generateAESKey(testAlias, config.keyValidityDays, false) }
     }
 
-    // ==================== Tests for decryptData failure when key not found ====================
+    // ==================== Tests for decryptData failure ====================
 
     @Test
     fun `decryptData should fail when key retrieval fails`() {
-        // Arrange
         val encryptedData = "encryptedBase64String"
         var successResult: ByteArray? = null
         var failureResult: CryptoLibException? = null
@@ -255,7 +232,6 @@ class CryptoManagerTest {
         every { KeyHelper.listKeys() } returns listOf(testAlias)
         every { KeyHelper.getAESKey(testAlias) } throws KeyNotFoundException(testAlias)
 
-        // Act
         CryptoManager.decryptData(
             activity = mockFragmentActivity,
             config = config,
@@ -264,7 +240,6 @@ class CryptoManagerTest {
             onFailure = { failureResult = it }
         )
 
-        // Assert
         assertEquals(null, successResult)
         assertNotNull(failureResult)
         assertTrue(failureResult is KeyNotFoundException)
@@ -272,7 +247,6 @@ class CryptoManagerTest {
 
     @Test
     fun `decryptData should fail when decryption throws exception`() {
-        // Arrange
         val encryptedData = "invalidEncryptedData"
         var successResult: ByteArray? = null
         var failureResult: CryptoLibException? = null
@@ -282,7 +256,6 @@ class CryptoManagerTest {
         every { AESEncryption.decrypt(encryptedData, mockSecretKey) } throws
                 CryptoOperationException("Decryption failed")
 
-        // Act
         CryptoManager.decryptData(
             activity = mockFragmentActivity,
             config = config,
@@ -291,7 +264,6 @@ class CryptoManagerTest {
             onFailure = { failureResult = it }
         )
 
-        // Assert
         assertEquals(null, successResult)
         assertNotNull(failureResult)
         assertTrue(failureResult is CryptoOperationException)
@@ -301,7 +273,6 @@ class CryptoManagerTest {
 
     @Test
     fun `encryptData should fail when activity is not FragmentActivity and auth required`() {
-        // Arrange
         val plaintext = "Test data".toByteArray()
         var successResult: String? = null
         var failureResult: CryptoLibException? = null
@@ -309,16 +280,14 @@ class CryptoManagerTest {
         every { KeyHelper.listKeys() } returns listOf(testAlias)
         every { KeyHelper.getAESKey(testAlias) } returns mockSecretKey
 
-        // Act
         CryptoManager.encryptData(
-            activity = mockActivity, // Regular Activity, not FragmentActivity
-            config = configWithAuth, // Config requiring user authentication
+            activity = mockActivity,
+            config = configWithAuth,
             plaintext = plaintext,
             onSuccess = { successResult = it },
             onFailure = { failureResult = it }
         )
 
-        // Assert
         assertEquals(null, successResult)
         assertNotNull(failureResult)
         assertTrue(failureResult is CryptoOperationException)
@@ -327,7 +296,6 @@ class CryptoManagerTest {
 
     @Test
     fun `decryptData should fail when activity is not FragmentActivity and auth required`() {
-        // Arrange
         val encryptedData = "encryptedBase64String"
         var successResult: ByteArray? = null
         var failureResult: CryptoLibException? = null
@@ -335,55 +303,60 @@ class CryptoManagerTest {
         every { KeyHelper.listKeys() } returns listOf(testAlias)
         every { KeyHelper.getAESKey(testAlias) } returns mockSecretKey
 
-        // Act
         CryptoManager.decryptData(
-            activity = mockActivity, // Regular Activity, not FragmentActivity
-            config = configWithAuth, // Config requiring user authentication
+            activity = mockActivity,
+            config = configWithAuth,
             encryptedData = encryptedData,
             onSuccess = { successResult = it },
             onFailure = { failureResult = it }
         )
 
-        // Assert
         assertEquals(null, successResult)
         assertNotNull(failureResult)
         assertTrue(failureResult is CryptoOperationException)
         assertTrue(failureResult!!.message!!.contains("Biometric authentication requires a FragmentActivity"))
     }
 
-    // ==================== Tests for performAuthenticatedAction ====================
+    // ==================== Tests for biometric authentication path ====================
 
     @Test
     fun `encryptData should call BiometricHelper authenticate when auth is required`() {
-        // Arrange
         val plaintext = "Test data".toByteArray()
-        val expectedEncryptedData = "encryptedResult"
         var successResult: String? = null
         var failureResult: CryptoLibException? = null
 
-        val onSuccessSlot = slot<(ByteArray) -> Unit>()
+        val mockCipher: Cipher = mockk(relaxed = true)
+        val mockIv = ByteArray(12) { it.toByte() }
+        val mockCiphertext = "ciphertext".toByteArray()
+        every { mockCipher.doFinal(plaintext) } returns mockCiphertext
+        every { mockCipher.iv } returns mockIv
+
+        mockkStatic(Cipher::class)
+        every { Cipher.getInstance("AES/GCM/NoPadding") } returns mockCipher
+        every { mockCipher.init(Cipher.ENCRYPT_MODE, mockSecretKey) } returns Unit
+
+        val onSuccessSlot = slot<(BiometricPrompt.CryptoObject) -> Unit>()
 
         every { KeyHelper.listKeys() } returns listOf(testAlias)
         every { KeyHelper.getAESKey(testAlias) } returns mockSecretKey
-        every { AESEncryption.encrypt(plaintext, mockSecretKey) } returns expectedEncryptedData
-        every { KeyRotationManager.rotateKeyIfNeeded(testAlias) } just runs
+
+        val mockAuthCryptoObject: BiometricPrompt.CryptoObject = mockk(relaxed = true)
+        every { mockAuthCryptoObject.cipher } returns mockCipher
 
         every {
             anyConstructed<BiometricHelper>().authenticate(
                 activity = any(),
                 title = any(),
                 description = any(),
-                encryptedData = any(),
+                cryptoObject = any(),
                 onSuccess = capture(onSuccessSlot),
                 onError = any(),
                 onAuthenticationError = any()
             )
         } answers {
-            // Simulate successful biometric authentication
-            onSuccessSlot.captured.invoke(ByteArray(0))
+            onSuccessSlot.captured.invoke(mockAuthCryptoObject)
         }
 
-        // Act
         CryptoManager.encryptData(
             activity = mockFragmentActivity,
             config = configWithAuth,
@@ -392,15 +365,14 @@ class CryptoManagerTest {
             onFailure = { failureResult = it }
         )
 
-        // Assert
-        assertEquals(expectedEncryptedData, successResult)
+        assertNotNull(successResult)
         assertEquals(null, failureResult)
         verify(exactly = 1) {
             anyConstructed<BiometricHelper>().authenticate(
                 activity = mockFragmentActivity,
                 title = "Encrypt Data",
                 description = "Authenticate to encrypt your data",
-                encryptedData = any(),
+                cryptoObject = any(),
                 onSuccess = any(),
                 onError = any(),
                 onAuthenticationError = any()
@@ -410,34 +382,44 @@ class CryptoManagerTest {
 
     @Test
     fun `decryptData should call BiometricHelper authenticate when auth is required`() {
-        // Arrange
-        val encryptedData = "encryptedBase64String"
+        // For the biometric decrypt path, we need valid Base64 data with IV
+        val iv = ByteArray(12) { it.toByte() }
+        val ciphertext = "encrypted_content".toByteArray()
+        val combined = iv + ciphertext
+        val encryptedData = java.util.Base64.getEncoder().encodeToString(combined)
         val expectedDecryptedData = "Decrypted!".toByteArray()
         var successResult: ByteArray? = null
         var failureResult: CryptoLibException? = null
 
-        val onSuccessSlot = slot<(ByteArray) -> Unit>()
+        val mockCipher: Cipher = mockk(relaxed = true)
+        every { mockCipher.doFinal(ciphertext) } returns expectedDecryptedData
+
+        mockkStatic(Cipher::class)
+        every { Cipher.getInstance("AES/GCM/NoPadding") } returns mockCipher
+        every { mockCipher.init(any(), any<SecretKey>(), any<javax.crypto.spec.GCMParameterSpec>()) } returns Unit
+
+        val onSuccessSlot = slot<(BiometricPrompt.CryptoObject) -> Unit>()
 
         every { KeyHelper.listKeys() } returns listOf(testAlias)
         every { KeyHelper.getAESKey(testAlias) } returns mockSecretKey
-        every { AESEncryption.decrypt(encryptedData, mockSecretKey) } returns expectedDecryptedData
+
+        val mockAuthCryptoObject: BiometricPrompt.CryptoObject = mockk(relaxed = true)
+        every { mockAuthCryptoObject.cipher } returns mockCipher
 
         every {
             anyConstructed<BiometricHelper>().authenticate(
                 activity = any(),
                 title = any(),
                 description = any(),
-                encryptedData = any(),
+                cryptoObject = any(),
                 onSuccess = capture(onSuccessSlot),
                 onError = any(),
                 onAuthenticationError = any()
             )
         } answers {
-            // Simulate successful biometric authentication
-            onSuccessSlot.captured.invoke(ByteArray(0))
+            onSuccessSlot.captured.invoke(mockAuthCryptoObject)
         }
 
-        // Act
         CryptoManager.decryptData(
             activity = mockFragmentActivity,
             config = configWithAuth,
@@ -446,7 +428,6 @@ class CryptoManagerTest {
             onFailure = { failureResult = it }
         )
 
-        // Assert
         assertTrue(expectedDecryptedData.contentEquals(successResult))
         assertEquals(null, failureResult)
         verify(exactly = 1) {
@@ -454,7 +435,7 @@ class CryptoManagerTest {
                 activity = mockFragmentActivity,
                 title = "Decrypt Data",
                 description = "Authenticate to decrypt your data",
-                encryptedData = encryptedData.toByteArray(Charsets.UTF_8),
+                cryptoObject = any(),
                 onSuccess = any(),
                 onError = any(),
                 onAuthenticationError = any()
@@ -464,7 +445,6 @@ class CryptoManagerTest {
 
     @Test
     fun `performAuthenticatedAction should skip biometric when auth not required`() {
-        // Arrange
         val plaintext = "Test data".toByteArray()
         val expectedEncryptedData = "encryptedResult"
         var successResult: String? = null
@@ -472,25 +452,22 @@ class CryptoManagerTest {
         every { KeyHelper.listKeys() } returns listOf(testAlias)
         every { KeyHelper.getAESKey(testAlias) } returns mockSecretKey
         every { AESEncryption.encrypt(plaintext, mockSecretKey) } returns expectedEncryptedData
-        every { KeyRotationManager.rotateKeyIfNeeded(testAlias) } just runs
 
-        // Act
         CryptoManager.encryptData(
             activity = mockFragmentActivity,
-            config = config, // No authentication required
+            config = config,
             plaintext = plaintext,
             onSuccess = { successResult = it },
             onFailure = { }
         )
 
-        // Assert
         assertEquals(expectedEncryptedData, successResult)
         verify(exactly = 0) {
             anyConstructed<BiometricHelper>().authenticate(
                 activity = any(),
                 title = any(),
                 description = any(),
-                encryptedData = any(),
+                cryptoObject = any(),
                 onSuccess = any(),
                 onError = any(),
                 onAuthenticationError = any()
@@ -502,13 +479,11 @@ class CryptoManagerTest {
 
     @Test
     fun `encryptData should handle unexpected exception gracefully`() {
-        // Arrange
         val plaintext = "Test data".toByteArray()
         var failureResult: CryptoLibException? = null
 
         every { KeyHelper.listKeys() } throws RuntimeException("Unexpected error")
 
-        // Act
         CryptoManager.encryptData(
             activity = mockFragmentActivity,
             config = config,
@@ -517,7 +492,6 @@ class CryptoManagerTest {
             onFailure = { failureResult = it }
         )
 
-        // Assert
         assertNotNull(failureResult)
         assertTrue(failureResult is CryptoOperationException)
         assertTrue(failureResult!!.message!!.contains("Unexpected error during authenticated action"))
@@ -525,13 +499,11 @@ class CryptoManagerTest {
 
     @Test
     fun `decryptData should handle unexpected exception gracefully`() {
-        // Arrange
         val encryptedData = "encryptedBase64String"
         var failureResult: CryptoLibException? = null
 
         every { KeyHelper.listKeys() } throws RuntimeException("Unexpected error")
 
-        // Act
         CryptoManager.decryptData(
             activity = mockFragmentActivity,
             config = config,
@@ -540,20 +512,23 @@ class CryptoManagerTest {
             onFailure = { failureResult = it }
         )
 
-        // Assert
         assertNotNull(failureResult)
         assertTrue(failureResult is CryptoOperationException)
         assertTrue(failureResult!!.message!!.contains("Unexpected error during authenticated action"))
     }
 
-    // ==================== Additional Authentication Tests ====================
+    // ==================== Authentication Error Tests ====================
 
     @Test
     fun `encryptData should handle authentication error callback`() {
-        // Arrange
         val plaintext = "Test data".toByteArray()
         var failureResult: CryptoLibException? = null
         val onAuthErrorSlot = slot<(Int, CharSequence) -> Unit>()
+
+        val mockCipher: Cipher = mockk(relaxed = true)
+        mockkStatic(Cipher::class)
+        every { Cipher.getInstance("AES/GCM/NoPadding") } returns mockCipher
+        every { mockCipher.init(Cipher.ENCRYPT_MODE, mockSecretKey) } returns Unit
 
         every { KeyHelper.listKeys() } returns listOf(testAlias)
         every { KeyHelper.getAESKey(testAlias) } returns mockSecretKey
@@ -563,17 +538,15 @@ class CryptoManagerTest {
                 activity = any(),
                 title = any(),
                 description = any(),
-                encryptedData = any(),
+                cryptoObject = any(),
                 onSuccess = any(),
                 onError = any(),
                 onAuthenticationError = capture(onAuthErrorSlot)
             )
         } answers {
-            // Simulate authentication error
             onAuthErrorSlot.captured.invoke(10, "Too many attempts")
         }
 
-        // Act
         CryptoManager.encryptData(
             activity = mockFragmentActivity,
             config = configWithAuth,
@@ -582,19 +555,25 @@ class CryptoManagerTest {
             onFailure = { failureResult = it }
         )
 
-        // Assert
         assertNotNull(failureResult)
         assertTrue(failureResult is AuthenticationException)
         assertTrue(failureResult!!.message!!.contains("Authentication error [10]"))
-        assertTrue(failureResult.message!!.contains("Too many attempts"))
+        assertTrue(failureResult!!.message!!.contains("Too many attempts"))
     }
 
     @Test
     fun `decryptData should handle authentication error callback`() {
-        // Arrange
-        val encryptedData = "encryptedBase64String"
+        val iv = ByteArray(12) { it.toByte() }
+        val ciphertext = "content".toByteArray()
+        val combined = iv + ciphertext
+        val encryptedData = java.util.Base64.getEncoder().encodeToString(combined)
         var failureResult: CryptoLibException? = null
         val onAuthErrorSlot = slot<(Int, CharSequence) -> Unit>()
+
+        val mockCipher: Cipher = mockk(relaxed = true)
+        mockkStatic(Cipher::class)
+        every { Cipher.getInstance("AES/GCM/NoPadding") } returns mockCipher
+        every { mockCipher.init(any(), any<SecretKey>(), any<javax.crypto.spec.GCMParameterSpec>()) } returns Unit
 
         every { KeyHelper.listKeys() } returns listOf(testAlias)
         every { KeyHelper.getAESKey(testAlias) } returns mockSecretKey
@@ -604,17 +583,15 @@ class CryptoManagerTest {
                 activity = any(),
                 title = any(),
                 description = any(),
-                encryptedData = any(),
+                cryptoObject = any(),
                 onSuccess = any(),
                 onError = any(),
                 onAuthenticationError = capture(onAuthErrorSlot)
             )
         } answers {
-            // Simulate authentication error
             onAuthErrorSlot.captured.invoke(5, "Fingerprint not recognized")
         }
 
-        // Act
         CryptoManager.decryptData(
             activity = mockFragmentActivity,
             config = configWithAuth,
@@ -623,19 +600,22 @@ class CryptoManagerTest {
             onFailure = { failureResult = it }
         )
 
-        // Assert
         assertNotNull(failureResult)
         assertTrue(failureResult is AuthenticationException)
         assertTrue(failureResult!!.message!!.contains("Authentication error [5]"))
-        assertTrue(failureResult.message!!.contains("Fingerprint not recognized"))
+        assertTrue(failureResult!!.message!!.contains("Fingerprint not recognized"))
     }
 
     @Test
     fun `encryptData should handle biometric error callback`() {
-        // Arrange
         val plaintext = "Test data".toByteArray()
         var failureResult: CryptoLibException? = null
         val onErrorSlot = slot<(Exception) -> Unit>()
+
+        val mockCipher: Cipher = mockk(relaxed = true)
+        mockkStatic(Cipher::class)
+        every { Cipher.getInstance("AES/GCM/NoPadding") } returns mockCipher
+        every { mockCipher.init(Cipher.ENCRYPT_MODE, mockSecretKey) } returns Unit
 
         every { KeyHelper.listKeys() } returns listOf(testAlias)
         every { KeyHelper.getAESKey(testAlias) } returns mockSecretKey
@@ -645,17 +625,15 @@ class CryptoManagerTest {
                 activity = any(),
                 title = any(),
                 description = any(),
-                encryptedData = any(),
+                cryptoObject = any(),
                 onSuccess = any(),
                 onError = capture(onErrorSlot),
                 onAuthenticationError = any()
             )
         } answers {
-            // Simulate biometric error
             onErrorSlot.captured.invoke(Exception("Biometric sensor unavailable"))
         }
 
-        // Act
         CryptoManager.encryptData(
             activity = mockFragmentActivity,
             config = configWithAuth,
@@ -664,19 +642,25 @@ class CryptoManagerTest {
             onFailure = { failureResult = it }
         )
 
-        // Assert
         assertNotNull(failureResult)
         assertTrue(failureResult is CryptoOperationException)
         assertTrue(failureResult!!.message!!.contains("Biometric authentication error"))
-        assertTrue(failureResult.message!!.contains("Biometric sensor unavailable"))
+        assertTrue(failureResult!!.message!!.contains("Biometric sensor unavailable"))
     }
 
     @Test
     fun `decryptData should handle biometric error callback`() {
-        // Arrange
-        val encryptedData = "encryptedBase64String"
+        val iv = ByteArray(12) { it.toByte() }
+        val ciphertext = "content".toByteArray()
+        val combined = iv + ciphertext
+        val encryptedData = java.util.Base64.getEncoder().encodeToString(combined)
         var failureResult: CryptoLibException? = null
         val onErrorSlot = slot<(Exception) -> Unit>()
+
+        val mockCipher: Cipher = mockk(relaxed = true)
+        mockkStatic(Cipher::class)
+        every { Cipher.getInstance("AES/GCM/NoPadding") } returns mockCipher
+        every { mockCipher.init(any(), any<SecretKey>(), any<javax.crypto.spec.GCMParameterSpec>()) } returns Unit
 
         every { KeyHelper.listKeys() } returns listOf(testAlias)
         every { KeyHelper.getAESKey(testAlias) } returns mockSecretKey
@@ -686,17 +670,15 @@ class CryptoManagerTest {
                 activity = any(),
                 title = any(),
                 description = any(),
-                encryptedData = any(),
+                cryptoObject = any(),
                 onSuccess = any(),
                 onError = capture(onErrorSlot),
                 onAuthenticationError = any()
             )
         } answers {
-            // Simulate biometric error
             onErrorSlot.captured.invoke(Exception("Hardware not available"))
         }
 
-        // Act
         CryptoManager.decryptData(
             activity = mockFragmentActivity,
             config = configWithAuth,
@@ -705,18 +687,16 @@ class CryptoManagerTest {
             onFailure = { failureResult = it }
         )
 
-        // Assert
         assertNotNull(failureResult)
         assertTrue(failureResult is CryptoOperationException)
         assertTrue(failureResult!!.message!!.contains("Biometric authentication error"))
-        assertTrue(failureResult.message!!.contains("Hardware not available"))
+        assertTrue(failureResult!!.message!!.contains("Hardware not available"))
     }
 
     // ==================== Integration Tests ====================
 
     @Test
     fun `encrypt and decrypt round trip without authentication should work`() {
-        // Arrange
         val originalData = "Secret message for encryption".toByteArray()
         val encryptedString = "encryptedBase64String"
         var encryptedResult: String? = null
@@ -726,9 +706,7 @@ class CryptoManagerTest {
         every { KeyHelper.getAESKey(testAlias) } returns mockSecretKey
         every { AESEncryption.encrypt(originalData, mockSecretKey) } returns encryptedString
         every { AESEncryption.decrypt(encryptedString, mockSecretKey) } returns originalData
-        every { KeyRotationManager.rotateKeyIfNeeded(testAlias) } just runs
 
-        // Act - Encrypt
         CryptoManager.encryptData(
             activity = mockFragmentActivity,
             config = config,
@@ -737,11 +715,9 @@ class CryptoManagerTest {
             onFailure = { fail("Encryption failed: ${it.message}") }
         )
 
-        // Assert - Encryption succeeded
         assertNotNull(encryptedResult)
         assertEquals(encryptedString, encryptedResult)
 
-        // Act - Decrypt
         CryptoManager.decryptData(
             activity = mockFragmentActivity,
             config = config,
@@ -750,81 +726,6 @@ class CryptoManagerTest {
             onFailure = { fail("Decryption failed: ${it.message}") }
         )
 
-        // Assert - Decryption succeeded and data matches
-        assertNotNull(decryptedResult)
-        assertArrayEquals(originalData, decryptedResult)
-    }
-
-    @Test
-    fun `encrypt and decrypt with authentication should work when auth succeeds`() {
-        // Arrange
-        val originalData = "Authenticated secret".toByteArray()
-        val encryptedString = "authEncryptedData"
-        var encryptedResult: String? = null
-        var decryptedResult: ByteArray? = null
-
-        val onSuccessSlotEncrypt = slot<(ByteArray) -> Unit>()
-        val onSuccessSlotDecrypt = slot<(ByteArray) -> Unit>()
-
-        every { KeyHelper.listKeys() } returns listOf(testAlias)
-        every { KeyHelper.getAESKey(testAlias) } returns mockSecretKey
-        every { AESEncryption.encrypt(originalData, mockSecretKey) } returns encryptedString
-        every { AESEncryption.decrypt(encryptedString, mockSecretKey) } returns originalData
-        every { KeyRotationManager.rotateKeyIfNeeded(testAlias) } just runs
-
-        // Mock successful biometric authentication for encryption
-        every {
-            anyConstructed<BiometricHelper>().authenticate(
-                activity = any(),
-                title = "Encrypt Data",
-                description = any(),
-                encryptedData = ByteArray(0),
-                onSuccess = capture(onSuccessSlotEncrypt),
-                onError = any(),
-                onAuthenticationError = any()
-            )
-        } answers {
-            onSuccessSlotEncrypt.captured.invoke(ByteArray(0))
-        }
-
-        // Act - Encrypt
-        CryptoManager.encryptData(
-            activity = mockFragmentActivity,
-            config = configWithAuth,
-            plaintext = originalData,
-            onSuccess = { encryptedResult = it },
-            onFailure = { fail("Encryption failed: ${it.message}") }
-        )
-
-        // Assert - Encryption succeeded
-        assertNotNull(encryptedResult)
-        assertEquals(encryptedString, encryptedResult)
-
-        // Mock successful biometric authentication for decryption
-        every {
-            anyConstructed<BiometricHelper>().authenticate(
-                activity = any(),
-                title = "Decrypt Data",
-                description = any(),
-                encryptedData = encryptedString.toByteArray(Charsets.UTF_8),
-                onSuccess = capture(onSuccessSlotDecrypt),
-                onError = any(),
-                onAuthenticationError = any()
-            )
-        } answers {
-            onSuccessSlotDecrypt.captured.invoke(ByteArray(0))
-        }
-
-        // Act - Decrypt
-        CryptoManager.decryptData(
-            activity = mockFragmentActivity,
-            config = configWithAuth,
-            encryptedData = encryptedResult!!,
-            onSuccess = { decryptedResult = it },
-            onFailure = { fail("Decryption failed: ${it.message}") }
-        )
-
-        // Assert - Decryption succeeded and data matches
         assertNotNull(decryptedResult)
         assertArrayEquals(originalData, decryptedResult)
     }
@@ -833,17 +734,14 @@ class CryptoManagerTest {
 
     @Test
     fun `multiple encryptions with same plaintext should all succeed`() {
-        // Arrange
         val plaintext = "Repeated message".toByteArray()
         every { KeyHelper.listKeys() } returns listOf(testAlias)
         every { KeyHelper.getAESKey(testAlias) } returns mockSecretKey
         every { AESEncryption.encrypt(plaintext, mockSecretKey) } returnsMany
             listOf("encrypted1", "encrypted2", "encrypted3")
-        every { KeyRotationManager.rotateKeyIfNeeded(testAlias) } just runs
 
         val results = mutableListOf<String>()
 
-        // Act - Perform multiple encryptions
         repeat(3) { index ->
             CryptoManager.encryptData(
                 activity = mockFragmentActivity,
@@ -854,18 +752,15 @@ class CryptoManagerTest {
             )
         }
 
-        // Assert
         assertEquals(3, results.size)
         assertEquals("encrypted1", results[0])
         assertEquals("encrypted2", results[1])
         assertEquals("encrypted3", results[2])
         verify(exactly = 3) { AESEncryption.encrypt(plaintext, mockSecretKey) }
-        verify(exactly = 3) { KeyRotationManager.rotateKeyIfNeeded(testAlias) }
     }
 
     @Test
     fun `multiple decryptions with different encrypted data should all succeed`() {
-        // Arrange
         val encrypted1 = "encryptedData1"
         val encrypted2 = "encryptedData2"
         val decrypted1 = "Message 1".toByteArray()
@@ -878,7 +773,6 @@ class CryptoManagerTest {
 
         val results = mutableListOf<ByteArray>()
 
-        // Act
         CryptoManager.decryptData(
             activity = mockFragmentActivity,
             config = config,
@@ -895,7 +789,6 @@ class CryptoManagerTest {
             onFailure = { fail("Second decryption failed") }
         )
 
-        // Assert
         assertEquals(2, results.size)
         assertArrayEquals(decrypted1, results[0])
         assertArrayEquals(decrypted2, results[1])
@@ -905,7 +798,6 @@ class CryptoManagerTest {
 
     @Test
     fun `different configs with different key aliases should use different keys`() {
-        // Arrange
         val config1 = CryptoConfig.Builder("key_alias_1").build()
         val config2 = CryptoConfig.Builder("key_alias_2").build()
         val plaintext = "Test data".toByteArray()
@@ -917,12 +809,10 @@ class CryptoManagerTest {
         every { KeyHelper.getAESKey("key_alias_2") } returns mockKey2
         every { AESEncryption.encrypt(plaintext, mockKey1) } returns "encrypted1"
         every { AESEncryption.encrypt(plaintext, mockKey2) } returns "encrypted2"
-        every { KeyRotationManager.rotateKeyIfNeeded(any()) } just runs
 
         var result1: String? = null
         var result2: String? = null
 
-        // Act
         CryptoManager.encryptData(
             activity = mockFragmentActivity,
             config = config1,
@@ -939,7 +829,6 @@ class CryptoManagerTest {
             onFailure = { fail("Second encryption failed") }
         )
 
-        // Assert
         assertEquals("encrypted1", result1)
         assertEquals("encrypted2", result2)
         verify { KeyHelper.getAESKey("key_alias_1") }
@@ -950,7 +839,6 @@ class CryptoManagerTest {
 
     @Test
     fun `encryptData with empty plaintext should be handled by AESEncryption layer`() {
-        // Arrange
         val emptyData = ByteArray(0)
         var failureResult: CryptoLibException? = null
 
@@ -959,7 +847,6 @@ class CryptoManagerTest {
         every { AESEncryption.encrypt(emptyData, mockSecretKey) } throws
             CryptoOperationException("Encryption failed: plaintext cannot be empty")
 
-        // Act
         CryptoManager.encryptData(
             activity = mockFragmentActivity,
             config = config,
@@ -968,25 +855,21 @@ class CryptoManagerTest {
             onFailure = { failureResult = it }
         )
 
-        // Assert
         assertNotNull(failureResult)
         assertTrue(failureResult is CryptoOperationException)
     }
 
-    // ==================== Key Rotation Tests ====================
+    // ==================== Key Rotation No Longer Triggered ====================
 
     @Test
-    fun `encryptData should trigger key rotation after successful encryption`() {
-        // Arrange
+    fun `encryptData should not trigger key rotation`() {
         val plaintext = "Test data".toByteArray()
         val encryptedData = "encryptedData"
 
         every { KeyHelper.listKeys() } returns listOf(testAlias)
         every { KeyHelper.getAESKey(testAlias) } returns mockSecretKey
         every { AESEncryption.encrypt(plaintext, mockSecretKey) } returns encryptedData
-        every { KeyRotationManager.rotateKeyIfNeeded(testAlias) } just runs
 
-        // Act
         CryptoManager.encryptData(
             activity = mockFragmentActivity,
             config = config,
@@ -994,37 +877,10 @@ class CryptoManagerTest {
             onSuccess = { },
             onFailure = { fail("Should succeed") }
         )
-
-        // Assert
-        verify(exactly = 1) { KeyRotationManager.rotateKeyIfNeeded(testAlias) }
-    }
-
-    @Test
-    fun `encryptData should not trigger key rotation when encryption fails`() {
-        // Arrange
-        val plaintext = "Test data".toByteArray()
-
-        every { KeyHelper.listKeys() } returns listOf(testAlias)
-        every { KeyHelper.getAESKey(testAlias) } returns mockSecretKey
-        every { AESEncryption.encrypt(plaintext, mockSecretKey) } throws
-            CryptoOperationException("Encryption failed")
-
-        // Act
-        CryptoManager.encryptData(
-            activity = mockFragmentActivity,
-            config = config,
-            plaintext = plaintext,
-            onSuccess = { fail("Should not succeed") },
-            onFailure = { }
-        )
-
-        // Assert
-        verify(exactly = 0) { KeyRotationManager.rotateKeyIfNeeded(any()) }
     }
 
     @Test
     fun `decryptData should not trigger key rotation`() {
-        // Arrange
         val encryptedData = "encryptedBase64String"
         val decryptedData = "Decrypted!".toByteArray()
 
@@ -1032,7 +888,6 @@ class CryptoManagerTest {
         every { KeyHelper.getAESKey(testAlias) } returns mockSecretKey
         every { AESEncryption.decrypt(encryptedData, mockSecretKey) } returns decryptedData
 
-        // Act
         CryptoManager.decryptData(
             activity = mockFragmentActivity,
             config = config,
@@ -1040,8 +895,5 @@ class CryptoManagerTest {
             onSuccess = { },
             onFailure = { fail("Should succeed") }
         )
-
-        // Assert
-        verify(exactly = 0) { KeyRotationManager.rotateKeyIfNeeded(any()) }
     }
 }

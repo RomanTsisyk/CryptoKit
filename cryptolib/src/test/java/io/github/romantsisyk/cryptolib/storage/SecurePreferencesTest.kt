@@ -1,8 +1,8 @@
 package io.github.romantsisyk.cryptolib.storage
 
 import android.content.Context
+import org.robolectric.RobolectricTestRunner
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.github.romantsisyk.cryptolib.crypto.keymanagement.KeyHelper
 import io.github.romantsisyk.cryptolib.exceptions.CryptoOperationException
 import org.junit.After
@@ -16,7 +16,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@RunWith(AndroidJUnit4::class)
+@RunWith(RobolectricTestRunner::class)
 class SecurePreferencesTest {
 
     private lateinit var context: Context

@@ -25,10 +25,11 @@ CryptoKit provides constrained abstractions that remove these footguns without h
 ## Core Capabilities
 
 - Symmetric encryption (AES-256-GCM) and decryption with authenticated encryption
-- Asymmetric key operations (RSA-OAEP) and digital signatures (RSA-SHA256)
+- Asymmetric key operations (RSA-OAEP) and digital signatures (RSA-PSS, ECDSA)
 - Secure key generation, storage, and lifecycle management via Android Keystore
 - Biometric and device credential authentication integration
 - Key rotation with configurable validity windows
+- JWT creation and validation with mandatory algorithm pinning
 - QR-based key distribution (generation and parsing)
 - Sealed error model with typed exceptions for predictable handling
 
@@ -52,15 +53,17 @@ All failures return sealed subtypes of `CryptoLibException`:
 - `KeyNotFoundException`: requested key does not exist
 - `KeyGenerationException`: key creation failed
 - `AuthenticationException`: biometric or device credential flow failed
+- `TokenException`: JWT creation or validation failures
+- `CertificateException`: certificate operations failures
 
-No raw Java exceptions escape the public API. Callers must handle the sealed exception type and pattern-match on subtypes.
+No raw Java exceptions escape the public API. Callers can use exhaustive `when` matching on the sealed exception type.
 
 ## Security Boundaries
 
 CryptoKit is intentionally scoped. It is NOT:
 
 - A TLS or network security library
-- A protocol implementation (no OAuth, JWT, etc.)
+- A protocol implementation (no OAuth, etc.)
 - A key backup or synchronization solution
 - A general-purpose cryptography framework
 
@@ -68,9 +71,8 @@ Key material is managed by Android Keystore only. Encrypted data and keys must b
 
 ## Status & Documentation
 
-This library is pre-1.0. API stability is not guaranteed until 1.0 release.
+This is the 1.0.0 stable release. The public API is stable and follows semantic versioning.
 
-For security policies, threat model, and best practices, see [SECURITY.md](SECURITY.md).
-For threading guarantees and blocking behavior, see [CONTRIBUTING.md](CONTRIBUTING.md).
+For security policies and threat model, see [SECURITY.md](SECURITY.md).
 
 Core API documentation is available in generated Kotlin docs.

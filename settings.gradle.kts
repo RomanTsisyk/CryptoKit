@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "CryptoKit"
 include(":cryptolib")
+include(":app")

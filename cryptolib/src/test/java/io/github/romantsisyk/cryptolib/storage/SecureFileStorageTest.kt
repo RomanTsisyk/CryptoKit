@@ -1,6 +1,6 @@
 package io.github.romantsisyk.cryptolib.storage
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import org.robolectric.RobolectricTestRunner
 import io.github.romantsisyk.cryptolib.crypto.keymanagement.KeyHelper
 import io.github.romantsisyk.cryptolib.exceptions.CryptoOperationException
 import org.junit.After
@@ -15,7 +15,7 @@ import org.junit.runner.RunWith
 import java.io.File
 import java.io.IOException
 
-@RunWith(AndroidJUnit4::class)
+@RunWith(RobolectricTestRunner::class)
 class SecureFileStorageTest {
 
     private lateinit var secureFileStorage: SecureFileStorage

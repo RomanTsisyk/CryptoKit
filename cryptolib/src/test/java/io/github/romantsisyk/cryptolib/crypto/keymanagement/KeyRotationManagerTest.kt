@@ -5,11 +5,12 @@ import io.github.romantsisyk.cryptolib.exceptions.KeyNotFoundException
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
-import io.mockk.mockkObject
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import io.mockk.runs
-import io.mockk.unmockkObject
 import io.mockk.verify
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -23,103 +24,234 @@ class KeyRotationManagerTest {
 
     @Before
     fun setUp() {
-        mockkObject(KeyHelper)
+        mockkStatic(KeyHelper::class)
     }
 
     @After
     fun tearDown() {
-        unmockkObject(KeyHelper)
+        unmockkStatic(KeyHelper::class)
     }
 
-    // ==================== Tests for rotateKeyIfNeeded ====================
+    // ==================== Tests for safeRotate ====================
 
     @Test
-    fun `rotateKeyIfNeeded should rotate key when key is expired`() {
-        // Arrange: Create a KeyInfo mock with an expired validity end date
+    fun `safeRotate should return NotNeeded when key is still valid`() {
+        // Arrange
         val mockKeyInfo = mockk<KeyInfo>()
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, -1) // Yesterday (expired)
-        val expiredDate = calendar.time
-
-        every { mockKeyInfo.keyValidityForOriginationEnd } returns expiredDate
-        every { KeyHelper.getKeyInfo(testAlias) } returns mockKeyInfo
-        every { KeyHelper.generateAESKey(testAlias) } just runs
-
-        // Act
-        KeyRotationManager.rotateKeyIfNeeded(testAlias)
-
-        // Assert: Key should be regenerated because it's expired
-        verify(atLeast = 1) { KeyHelper.generateAESKey(testAlias) }
-    }
-
-    @Test
-    fun `rotateKeyIfNeeded should not rotate key when key is still valid`() {
-        // Arrange: Create a KeyInfo mock with a future validity end date
-        val mockKeyInfo = mockk<KeyInfo>()
-        val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, 180) // 180 days in the future (still valid)
+        calendar.add(Calendar.DAY_OF_YEAR, 180)
         val futureDate = calendar.time
 
         every { mockKeyInfo.keyValidityForOriginationEnd } returns futureDate
         every { KeyHelper.getKeyInfo(testAlias) } returns mockKeyInfo
 
         // Act
-        KeyRotationManager.rotateKeyIfNeeded(testAlias)
+        val result = KeyRotationManager.safeRotate(testAlias)
 
-        // Assert: Key should NOT be regenerated because it's still valid
+        // Assert
+        assertTrue(result is KeyRotationResult.NotNeeded)
         verify(exactly = 0) { KeyHelper.generateAESKey(any()) }
     }
 
     @Test
-    fun `rotateKeyIfNeeded should not rotate when keyValidityForOriginationEnd is null`() {
-        // Arrange: Create a KeyInfo mock with null validity end date
+    fun `safeRotate should return NotNeeded when keyValidityForOriginationEnd is null`() {
+        // Arrange
         val mockKeyInfo = mockk<KeyInfo>()
-
         every { mockKeyInfo.keyValidityForOriginationEnd } returns null
         every { KeyHelper.getKeyInfo(testAlias) } returns mockKeyInfo
 
         // Act
-        KeyRotationManager.rotateKeyIfNeeded(testAlias)
+        val result = KeyRotationManager.safeRotate(testAlias)
 
-        // Assert: Key should NOT be regenerated because there's no end date set
-        verify(exactly = 0) { KeyHelper.generateAESKey(any()) }
+        // Assert
+        assertTrue(result is KeyRotationResult.NotNeeded)
     }
 
     @Test
-    fun `rotateKeyIfNeeded should rotate key when rotation interval has passed`() {
-        // Arrange: Create a KeyInfo mock with a validity end date that is more than 90 days in the past
+    fun `safeRotate should return Success with versioned alias when key is expired`() {
+        // Arrange
         val mockKeyInfo = mockk<KeyInfo>()
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, -100) // 100 days in the past (past the 90-day rotation interval)
+        calendar.add(Calendar.DAY_OF_YEAR, -1)
+        val expiredDate = calendar.time
+
+        every { mockKeyInfo.keyValidityForOriginationEnd } returns expiredDate
+        every { KeyHelper.getKeyInfo(testAlias) } returns mockKeyInfo
+        every { KeyHelper.nextVersionedAlias(testAlias) } returns "${testAlias}_v2"
+        every { KeyHelper.generateAESKey("${testAlias}_v2") } just runs
+
+        // Act
+        val result = KeyRotationManager.safeRotate(testAlias)
+
+        // Assert
+        assertTrue(result is KeyRotationResult.Success)
+        val success = result as KeyRotationResult.Success
+        assertEquals(testAlias, success.oldAlias)
+        assertEquals("${testAlias}_v2", success.newAlias)
+        verify(exactly = 1) { KeyHelper.generateAESKey("${testAlias}_v2") }
+    }
+
+    @Test
+    fun `safeRotate should return Failure when key generation fails`() {
+        // Arrange
+        val mockKeyInfo = mockk<KeyInfo>()
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_YEAR, -1)
+        val expiredDate = calendar.time
+
+        every { mockKeyInfo.keyValidityForOriginationEnd } returns expiredDate
+        every { KeyHelper.getKeyInfo(testAlias) } returns mockKeyInfo
+        every { KeyHelper.nextVersionedAlias(testAlias) } returns "${testAlias}_v2"
+        every { KeyHelper.generateAESKey("${testAlias}_v2") } throws RuntimeException("Key generation failed")
+
+        // Act
+        val result = KeyRotationManager.safeRotate(testAlias)
+
+        // Assert
+        assertTrue(result is KeyRotationResult.Failure)
+        val failure = result as KeyRotationResult.Failure
+        assertEquals(testAlias, failure.alias)
+        assertEquals("Key generation failed", failure.exception.message)
+    }
+
+    @Test
+    fun `safeRotate should return Success when key already expired`() {
+        // Arrange: key expired 100 days ago
+        val mockKeyInfo = mockk<KeyInfo>()
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_YEAR, -100)
+        val oldDate = calendar.time
+
+        every { mockKeyInfo.keyValidityForOriginationEnd } returns oldDate
+        every { KeyHelper.getKeyInfo(testAlias) } returns mockKeyInfo
+        every { KeyHelper.nextVersionedAlias(testAlias) } returns "${testAlias}_v2"
+        every { KeyHelper.generateAESKey("${testAlias}_v2") } just runs
+
+        // Act
+        val result = KeyRotationManager.safeRotate(testAlias)
+
+        // Assert
+        assertTrue(result is KeyRotationResult.Success)
+    }
+
+    @Test
+    fun `safeRotate should proactively rotate when key expires within rotation window`() {
+        // Arrange: key expires in 60 days — within the 90-day proactive rotation window
+        val mockKeyInfo = mockk<KeyInfo>()
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_YEAR, 60)
+        val soonExpiring = calendar.time
+
+        every { mockKeyInfo.keyValidityForOriginationEnd } returns soonExpiring
+        every { KeyHelper.getKeyInfo(testAlias) } returns mockKeyInfo
+        every { KeyHelper.nextVersionedAlias(testAlias) } returns "${testAlias}_v2"
+        every { KeyHelper.generateAESKey("${testAlias}_v2") } just runs
+
+        // Act
+        val result = KeyRotationManager.safeRotate(testAlias)
+
+        // Assert: should trigger proactive rotation (60 days < 90 day window)
+        assertTrue("Expected Success for proactive rotation, got $result", result is KeyRotationResult.Success)
+        verify(exactly = 1) { KeyHelper.generateAESKey("${testAlias}_v2") }
+    }
+
+    @Test
+    fun `safeRotate should NOT rotate when key expires beyond rotation window`() {
+        // Arrange: key expires in 120 days — outside the 90-day proactive rotation window
+        val mockKeyInfo = mockk<KeyInfo>()
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_YEAR, 120)
+        val farFuture = calendar.time
+
+        every { mockKeyInfo.keyValidityForOriginationEnd } returns farFuture
+        every { KeyHelper.getKeyInfo(testAlias) } returns mockKeyInfo
+
+        // Act
+        val result = KeyRotationManager.safeRotate(testAlias)
+
+        // Assert: 120 days until expiry > 90 day window — no rotation needed
+        assertTrue("Expected NotNeeded, got $result", result is KeyRotationResult.NotNeeded)
+        verify(exactly = 0) { KeyHelper.generateAESKey(any()) }
+    }
+
+    // ==================== Tests for rotateKeyIfNeeded (deprecated, kept for backwards compat) ====================
+
+    @Suppress("DEPRECATION")
+    @Test
+    fun `rotateKeyIfNeeded should rotate key when key is expired`() {
+        val mockKeyInfo = mockk<KeyInfo>()
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_YEAR, -1)
+        val expiredDate = calendar.time
+
+        every { mockKeyInfo.keyValidityForOriginationEnd } returns expiredDate
+        every { KeyHelper.getKeyInfo(testAlias) } returns mockKeyInfo
+        every { KeyHelper.generateAESKey(testAlias) } just runs
+
+        KeyRotationManager.rotateKeyIfNeeded(testAlias)
+
+        verify(atLeast = 1) { KeyHelper.generateAESKey(testAlias) }
+    }
+
+    @Suppress("DEPRECATION")
+    @Test
+    fun `rotateKeyIfNeeded should not rotate key when key is still valid`() {
+        val mockKeyInfo = mockk<KeyInfo>()
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_YEAR, 180)
+        val futureDate = calendar.time
+
+        every { mockKeyInfo.keyValidityForOriginationEnd } returns futureDate
+        every { KeyHelper.getKeyInfo(testAlias) } returns mockKeyInfo
+
+        KeyRotationManager.rotateKeyIfNeeded(testAlias)
+
+        verify(exactly = 0) { KeyHelper.generateAESKey(any()) }
+    }
+
+    @Suppress("DEPRECATION")
+    @Test
+    fun `rotateKeyIfNeeded should not rotate when keyValidityForOriginationEnd is null`() {
+        val mockKeyInfo = mockk<KeyInfo>()
+        every { mockKeyInfo.keyValidityForOriginationEnd } returns null
+        every { KeyHelper.getKeyInfo(testAlias) } returns mockKeyInfo
+
+        KeyRotationManager.rotateKeyIfNeeded(testAlias)
+
+        verify(exactly = 0) { KeyHelper.generateAESKey(any()) }
+    }
+
+    @Suppress("DEPRECATION")
+    @Test
+    fun `rotateKeyIfNeeded should rotate key when rotation interval has passed`() {
+        val mockKeyInfo = mockk<KeyInfo>()
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_YEAR, -100)
         val oldDate = calendar.time
 
         every { mockKeyInfo.keyValidityForOriginationEnd } returns oldDate
         every { KeyHelper.getKeyInfo(testAlias) } returns mockKeyInfo
         every { KeyHelper.generateAESKey(testAlias) } just runs
 
-        // Act
         KeyRotationManager.rotateKeyIfNeeded(testAlias)
 
-        // Assert: Key should be regenerated because both expiration and rotation interval have passed
         verify(atLeast = 1) { KeyHelper.generateAESKey(testAlias) }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun `rotateKeyIfNeeded should handle exception during key generation gracefully`() {
-        // Arrange: Create a KeyInfo mock with an expired validity end date
         val mockKeyInfo = mockk<KeyInfo>()
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, -1) // Yesterday (expired)
+        calendar.add(Calendar.DAY_OF_YEAR, -1)
         val expiredDate = calendar.time
 
         every { mockKeyInfo.keyValidityForOriginationEnd } returns expiredDate
         every { KeyHelper.getKeyInfo(testAlias) } returns mockKeyInfo
         every { KeyHelper.generateAESKey(testAlias) } throws RuntimeException("Key generation failed")
 
-        // Act & Assert: Should not throw an exception, just log the error
         KeyRotationManager.rotateKeyIfNeeded(testAlias)
 
-        // Verify that generateAESKey was called (even though it failed)
         verify { KeyHelper.generateAESKey(testAlias) }
     }
 
@@ -127,70 +259,55 @@ class KeyRotationManagerTest {
 
     @Test
     fun `isKeyRotationNeeded should return true when key is expired`() {
-        // Arrange: Create a KeyInfo mock with an expired validity end date
         val mockKeyInfo = mockk<KeyInfo>()
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, -1) // Yesterday (expired)
+        calendar.add(Calendar.DAY_OF_YEAR, -1)
         val expiredDate = calendar.time
 
         every { mockKeyInfo.keyValidityForOriginationEnd } returns expiredDate
         every { KeyHelper.getKeyInfo(testAlias) } returns mockKeyInfo
 
-        // Act
         val result = KeyRotationManager.isKeyRotationNeeded(testAlias)
 
-        // Assert
         assertTrue("Key rotation should be needed for expired key", result)
     }
 
     @Test
     fun `isKeyRotationNeeded should return false when key is still valid`() {
-        // Arrange: Create a KeyInfo mock with a future validity end date
         val mockKeyInfo = mockk<KeyInfo>()
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, 30) // 30 days in the future
+        calendar.add(Calendar.DAY_OF_YEAR, 30)
         val futureDate = calendar.time
 
         every { mockKeyInfo.keyValidityForOriginationEnd } returns futureDate
         every { KeyHelper.getKeyInfo(testAlias) } returns mockKeyInfo
 
-        // Act
         val result = KeyRotationManager.isKeyRotationNeeded(testAlias)
 
-        // Assert
         assertFalse("Key rotation should not be needed for valid key", result)
     }
 
     @Test
     fun `isKeyRotationNeeded should return false when keyValidityForOriginationEnd is null`() {
-        // Arrange: Create a KeyInfo mock with null validity end date
         val mockKeyInfo = mockk<KeyInfo>()
-
         every { mockKeyInfo.keyValidityForOriginationEnd } returns null
         every { KeyHelper.getKeyInfo(testAlias) } returns mockKeyInfo
 
-        // Act
         val result = KeyRotationManager.isKeyRotationNeeded(testAlias)
 
-        // Assert
         assertFalse("Key rotation should not be needed when no end date is set", result)
     }
 
     @Test(expected = KeyNotFoundException::class)
     fun `isKeyRotationNeeded should throw KeyNotFoundException when key does not exist`() {
-        // Arrange: Throw KeyNotFoundException when trying to get key info
         every { KeyHelper.getKeyInfo(testAlias) } throws KeyNotFoundException(testAlias)
-
-        // Act: This should throw KeyNotFoundException
         KeyRotationManager.isKeyRotationNeeded(testAlias)
     }
 
+    @Suppress("DEPRECATION")
     @Test(expected = KeyNotFoundException::class)
     fun `rotateKeyIfNeeded should throw KeyNotFoundException when key does not exist`() {
-        // Arrange: Throw KeyNotFoundException when trying to get key info
         every { KeyHelper.getKeyInfo(testAlias) } throws KeyNotFoundException(testAlias)
-
-        // Act: This should throw KeyNotFoundException
         KeyRotationManager.rotateKeyIfNeeded(testAlias)
     }
 
@@ -198,36 +315,40 @@ class KeyRotationManagerTest {
 
     @Test
     fun `isKeyRotationNeeded should return true when key expires exactly now`() {
-        // Arrange: Create a KeyInfo mock with validity end date set to now
         val mockKeyInfo = mockk<KeyInfo>()
         val now = Date()
 
         every { mockKeyInfo.keyValidityForOriginationEnd } returns now
         every { KeyHelper.getKeyInfo(testAlias) } returns mockKeyInfo
 
-        // Act
         val result = KeyRotationManager.isKeyRotationNeeded(testAlias)
 
-        // Assert: Should return false because Date.after() returns false when dates are equal
         assertFalse("Key rotation should not be needed when dates are exactly equal", result)
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun `rotateKeyIfNeeded should handle key expiring exactly at rotation interval boundary`() {
-        // Arrange: Key validity ended exactly 90 days ago (at the rotation interval boundary)
         val mockKeyInfo = mockk<KeyInfo>()
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, -90) // Exactly 90 days ago
+        calendar.add(Calendar.DAY_OF_YEAR, -90)
         val boundaryDate = calendar.time
 
         every { mockKeyInfo.keyValidityForOriginationEnd } returns boundaryDate
         every { KeyHelper.getKeyInfo(testAlias) } returns mockKeyInfo
         every { KeyHelper.generateAESKey(testAlias) } just runs
 
-        // Act
         KeyRotationManager.rotateKeyIfNeeded(testAlias)
 
-        // Assert: Key should be regenerated because it's expired (even if not past rotation interval)
         verify(atLeast = 1) { KeyHelper.generateAESKey(testAlias) }
+    }
+
+    @Test
+    fun `safeRotate should return Failure when key does not exist`() {
+        every { KeyHelper.getKeyInfo(testAlias) } throws KeyNotFoundException(testAlias)
+
+        val result = KeyRotationManager.safeRotate(testAlias)
+
+        assertTrue(result is KeyRotationResult.Failure)
     }
 }

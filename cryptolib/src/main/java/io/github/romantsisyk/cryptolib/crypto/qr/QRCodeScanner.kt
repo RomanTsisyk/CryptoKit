@@ -2,9 +2,9 @@ package io.github.romantsisyk.cryptolib.crypto.qr
 
 import android.graphics.Bitmap
 import com.google.zxing.BinaryBitmap
-import com.google.zxing.Reader
 import com.google.zxing.common.HybridBinarizer
 import com.google.zxing.qrcode.QRCodeReader
+import io.github.romantsisyk.cryptolib.exceptions.CryptoOperationException
 
 /**
  * Class responsible for scanning and decoding QR codes from a bitmap.
@@ -17,7 +17,7 @@ object QRCodeScanner {
      *
      * @param bitmap The bitmap to scan and decode.
      * @return The string content of the decoded QR code.
-     * @throws IllegalArgumentException If the QR code cannot be decoded.
+     * @throws CryptoOperationException If the QR code cannot be decoded.
      */
     @JvmStatic
     fun decodeQRCode(bitmap: Bitmap): String {
@@ -32,7 +32,7 @@ object QRCodeScanner {
             // Return the decoded string.
             return result.text
         } catch (e: Exception) {
-            throw IllegalArgumentException("Error decoding QR Code: ${e.message}", e)
+            throw CryptoOperationException("Error decoding QR Code: ${e.message}", e)
         }
     }
 }
